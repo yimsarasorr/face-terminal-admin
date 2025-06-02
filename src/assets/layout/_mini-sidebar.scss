@@ -1,0 +1,126 @@
+// Mini Sidebar Styles
+.layout-sidebar-mini {
+    width: 70px !important;
+    overflow: visible;
+    transition: width 0.3s ease;
+
+    .layout-menu {
+        .layout-menuitem-text,
+        .layout-submenu-toggler,
+        .layout-menu-separator {
+            display: none;
+        }
+
+        .layout-menuitem {
+            position: relative;
+
+            .layout-menuitem-content {
+                justify-content: center;
+                padding: 1rem;
+
+                .layout-menuitem-icon {
+                    margin-right: 0;
+                    font-size: 1.25rem;
+                }
+            }
+
+            // Tooltip สำหรับ mini mode
+            &:hover::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 100%;
+                top: 50%;
+                transform: translateY(-50%);
+                background: var(--surface-900);
+                color: var(--surface-0);
+                padding: 0.5rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.875rem;
+                white-space: nowrap;
+                z-index: 1000;
+                margin-left: 0.5rem;
+                box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+            }
+
+            &:hover::before {
+                content: '';
+                position: absolute;
+                left: 100%;
+                top: 50%;
+                transform: translateY(-50%);
+                border: 6px solid transparent;
+                border-right-color: var(--surface-900);
+                z-index: 1000;
+                margin-left: -6px;
+            }
+        }
+
+        .layout-menuitem-category {
+            display: none;
+        }
+    }
+}
+
+.layout-sidebar-expanded {
+    width: 280px !important;
+    transition: width 0.3s ease;
+}
+
+// Layout adjustments
+.layout-mini {
+    .layout-main-container {
+        margin-left: 70px;
+        transition: margin-left 0.3s ease;
+    }
+}
+
+.layout-mini.layout-sidebar-expanded {
+    .layout-main-container {
+        margin-left: 280px;
+    }
+}
+
+// Dark theme support
+.layout-sidebar-mini.app-dark {
+    .layout-menuitem:hover::after {
+        background: var(--surface-100);
+        color: var(--surface-900);
+    }
+
+    .layout-menuitem:hover::before {
+        border-right-color: var(--surface-100);
+    }
+}
+
+// Mobile responsive
+@media (max-width: 991px) {
+    .layout-sidebar-mini {
+        width: 280px !important;
+        
+        .layout-menu {
+            .layout-menuitem-text,
+            .layout-submenu-toggler,
+            .layout-menu-separator,
+            .layout-menuitem-category {
+                display: block;
+            }
+
+            .layout-menuitem {
+                &:hover::after,
+                &:hover::before {
+                    display: none;
+                }
+
+                .layout-menuitem-content {
+                    justify-content: flex-start;
+                    padding: 1rem 2rem;
+
+                    .layout-menuitem-icon {
+                        margin-right: 0.5rem;
+                        font-size: 1rem;
+                    }
+                }
+            }
+        }
+    }
+}
