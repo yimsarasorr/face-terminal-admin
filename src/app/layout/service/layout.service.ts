@@ -15,6 +15,7 @@ interface LayoutState {
     configSidebarVisible?: boolean;
     staticMenuMobileActive?: boolean;
     menuHoverActive?: boolean;
+    sidebarMinimized?: boolean; // เพิ่มใหม่
 }
 
 interface MenuChangeEvent {
@@ -39,7 +40,8 @@ export class LayoutService {
         overlayMenuActive: false,
         configSidebarVisible: false,
         staticMenuMobileActive: false,
-        menuHoverActive: false
+        menuHoverActive: false,
+        sidebarMinimized: true // เพิ่มใหม่ - เริ่มต้นเป็น mini mode
     };
 
     layoutConfig = signal<layoutConfig>(this._config);
@@ -73,6 +75,9 @@ export class LayoutService {
     getSurface = computed(() => this.layoutConfig().surface);
 
     isOverlay = computed(() => this.layoutConfig().menuMode === 'overlay');
+
+    // เพิ่ม computed สำหรับ sidebar minimized state
+    isSidebarMinimized = computed(() => this.layoutState().sidebarMinimized);
 
     transitionComplete = signal<boolean>(false);
 
@@ -133,6 +138,24 @@ export class LayoutService {
         setTimeout(() => {
             this.transitionComplete.set(false);
         });
+    }
+
+    // เพิ่ม method ใหม่สำหรับ toggle sidebar mini mode
+    onSidebarToggle() {
+        if (this.isDesktop()) {
+            this.layoutState.update((prev) => ({ 
+                ...prev, 
+                sidebarMinimized: !this.layoutState().sidebarMinimized 
+            }));
+        }
+    }
+
+    // เพิ่ม method สำหรับ set sidebar state
+    setSidebarMinimized(minimized: boolean) {
+        this.layoutState.update((prev) => ({ 
+            ...prev, 
+            sidebarMinimized: minimized 
+        }));
     }
 
     onMenuToggle() {
