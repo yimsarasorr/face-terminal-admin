@@ -95,9 +95,7 @@ export class AppLayout {
             'layout-static': this.layoutService.layoutConfig().menuMode === 'static',
             'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static',
             'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
-            'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive,
-            'layout-sidebar-mini': this.layoutService.layoutState().sidebarMinimized && this.layoutService.isDesktop(), // เพิ่ม class สำหรับ mini sidebar
-            'layout-sidebar-expanded': !this.layoutService.layoutState().sidebarMinimized && this.layoutService.isDesktop() // เพิ่ม class สำหรับ expanded sidebar
+            'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive
         };
     }
 
