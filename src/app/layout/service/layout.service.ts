@@ -31,7 +31,7 @@ export class LayoutService {
         primary: 'emerald',
         surface: null,
         darkTheme: false,
-        menuMode: 'static'
+        menuMode: 'slim' // เปลี่ยนจาก 'static' เป็น 'slim'
     };
 
     _state: LayoutState = {
@@ -72,7 +72,11 @@ export class LayoutService {
 
     getSurface = computed(() => this.layoutConfig().surface);
 
+    // Check if overlay mode is active
     isOverlay = computed(() => this.layoutConfig().menuMode === 'overlay');
+    
+    // Check if slim mode is active
+    isSlim = computed(() => this.layoutConfig().menuMode === 'slim');
 
     transitionComplete = signal<boolean>(false);
 
@@ -96,6 +100,14 @@ export class LayoutService {
 
             this.handleDarkModeTransition(config);
         });
+        
+        // Initialize with slim mode
+        this.setSlimMode();
+    }
+
+    // Set menu mode to slim
+    setSlimMode() {
+        this.layoutConfig.update((config) => ({ ...config, menuMode: 'slim' }));
     }
 
     private handleDarkModeTransition(config: layoutConfig): void {
@@ -136,6 +148,11 @@ export class LayoutService {
     }
 
     onMenuToggle() {
+        // สำหรับ slim mode ไม่ต้องทำอะไร
+        if (this.isSlim()) {
+            return;
+        }
+        
         if (this.isOverlay()) {
             this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
 

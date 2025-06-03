@@ -1,4 +1,4 @@
-import { Component, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnDestroy, Renderer2, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
@@ -20,10 +20,10 @@ import { LayoutService } from '../service/layout.service';
             </div>
             <app-footer></app-footer>
         </div>
-        <div class="layout-mask animate-fadein"></div>
+        <div class="layout-mask" (click)="hideMenu()"></div>
     </div> `
 })
-export class AppLayout {
+export class AppLayout implements OnDestroy {
     overlayMenuOpenSubscription: Subscription;
 
     menuOutsideClickListener: any;
@@ -37,23 +37,29 @@ export class AppLayout {
         public renderer: Renderer2,
         public router: Router
     ) {
-        this.overlayMenuOpenSubscription = this.layoutService.overlayOpen$.subscribe(() => {
-            if (!this.menuOutsideClickListener) {
-                this.menuOutsideClickListener = this.renderer.listen('document', 'click', (event) => {
-                    if (this.isOutsideClicked(event)) {
-                        this.hideMenu();
-                    }
-                });
-            }
-
-            if (this.layoutService.layoutState().staticMenuMobileActive) {
+        // เรียกใช้ setSlimMode เพื่อตั้งค่า menuMode เป็น slim
+        this.layoutService.setSlimMode();
+        
+        // แก้ไขปัญหา error "Property 'subscribe' does not exist on type 'WritableSignal<LayoutState>'"
+        // โดยใช้ effect แทน subscribe
+        effect(() => {
+            const state = this.layoutService.layoutState();
+            if (state.overlayMenuActive) {
                 this.blockBodyScroll();
+            } else {
+                this.unblockBodyScroll();
             }
         });
 
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-            this.hideMenu();
+            // Always hide mobile menu on navigation
+            if (this.layoutService.layoutState().staticMenuMobileActive) {
+                this.layoutService.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: false }));
+            }
         });
+        
+        // สร้าง Subscription เปล่าเพื่อให้ ngOnDestroy ทำงานได้
+        this.overlayMenuOpenSubscription = new Subscription();
     }
 
     isOutsideClicked(event: MouseEvent) {
@@ -73,6 +79,21 @@ export class AppLayout {
         this.unblockBodyScroll();
     }
 
+    get containerClass() {
+        return {
+            'layout-theme-light': !this.layoutService.isDarkTheme(),
+            'layout-theme-dark': this.layoutService.isDarkTheme(),
+            'layout-overlay': this.layoutService.isOverlay(),
+            'layout-static': !this.layoutService.isOverlay(),
+            'layout-static-active': !this.layoutService.layoutState().staticMenuDesktopInactive,
+            'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
+            'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive,
+            'p-input-filled': true,
+            'p-ripple-disabled': false,
+            'layout-static-slim': true
+        };
+    }
+
     blockBodyScroll(): void {
         if (document.body.classList) {
             document.body.classList.add('blocked-scroll');
@@ -87,16 +108,6 @@ export class AppLayout {
         } else {
             document.body.className = document.body.className.replace(new RegExp('(^|\\b)' + 'blocked-scroll'.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
         }
-    }
-
-    get containerClass() {
-        return {
-            'layout-overlay': this.layoutService.layoutConfig().menuMode === 'overlay',
-            'layout-static': this.layoutService.layoutConfig().menuMode === 'static',
-            'layout-static-inactive': this.layoutService.layoutState().staticMenuDesktopInactive && this.layoutService.layoutConfig().menuMode === 'static',
-            'layout-overlay-active': this.layoutService.layoutState().overlayMenuActive,
-            'layout-mobile-active': this.layoutService.layoutState().staticMenuMobileActive
-        };
     }
 
     ngOnDestroy() {

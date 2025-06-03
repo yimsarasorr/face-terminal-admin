@@ -6,16 +6,29 @@ import { filter } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { RippleModule } from 'primeng/ripple';
 import { MenuItem } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 import { LayoutService } from '../service/layout.service';
 
 @Component({
     // eslint-disable-next-line @angular-eslint/component-selector
     selector: '[app-menuitem]',
-    imports: [CommonModule, RouterModule, RippleModule],
+    standalone: true,
+    imports: [CommonModule, RouterModule, RippleModule, TooltipModule],
     template: `
         <ng-container>
             <div *ngIf="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
-            <a *ngIf="(!item.routerLink || item.items) && item.visible !== false" [attr.href]="item.url" (click)="itemClick($event)" [ngClass]="item.styleClass" [attr.target]="item.target" tabindex="0" pRipple>
+            <a
+                *ngIf="(!item.routerLink || item.items) && item.visible !== false"
+                [attr.href]="item.url"
+                (click)="itemClick($event)"
+                [ngClass]="item.styleClass"
+                [attr.target]="item.target"
+                tabindex="0"
+                pRipple
+                [pTooltip]="item.label"
+                tooltipPosition="right"
+                [tooltipStyleClass]="'menu-tooltip'"
+            >
                 <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
                 <span class="layout-menuitem-text">{{ item.label }}</span>
                 <i class="pi pi-fw pi-angle-down layout-submenu-toggler" *ngIf="item.items"></i>
@@ -37,6 +50,9 @@ import { LayoutService } from '../service/layout.service';
                 [attr.target]="item.target"
                 tabindex="0"
                 pRipple
+                [pTooltip]="item.label"
+                tooltipPosition="right"
+                [tooltipStyleClass]="'menu-tooltip'"
             >
                 <i [ngClass]="item.icon" class="layout-menuitem-icon"></i>
                 <span class="layout-menuitem-text">{{ item.label }}</span>
@@ -67,7 +83,6 @@ import { LayoutService } from '../service/layout.service';
             transition('collapsed <=> expanded', animate('400ms cubic-bezier(0.86, 0, 0.07, 1)'))
         ])
     ],
-    providers: [LayoutService]
 })
 export class AppMenuitem {
     @Input() item!: MenuItem;

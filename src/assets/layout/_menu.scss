@@ -2,19 +2,114 @@
 
 .layout-sidebar {
     position: fixed;
-    width: 20rem;
-    height: calc(100vh - 8rem);
-    z-index: 999;
+    width: 80px !important;
+    height: calc(100vh - 6rem - 4rem) !important; // ลดความสูงลงเพื่อให้มีระยะห่างจาก footer
+    z-index: 999 !important;
     overflow-y: auto;
-    user-select: none;
-    top: 6rem;
-    left: 2rem;
-    transition:
-        transform var(--layout-section-transition-duration),
-        left var(--layout-section-transition-duration);
+    top: 6rem !important;
+    left: 1rem !important;
+    margin-bottom: 4rem !important; // เพิ่มระยะห่างด้านล่าง
     background-color: var(--surface-overlay);
-    border-radius: var(--content-border-radius);
-    padding: 0.5rem 1.5rem;
+    border-radius: 12px !important;
+    padding: 0.5rem 0;
+    box-shadow: 0px 3px 5px rgba(0, 0, 0, .02), 0px 0px 2px rgba(0, 0, 0, .05), 0px 1px 4px rgba(0, 0, 0, .08);
+}
+
+.layout-menu-slim {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    position: relative;
+    z-index: 10;
+    
+    .menu-item {
+        position: relative;
+        margin: 0.5rem 0;
+        padding: 0 0.5rem;
+        text-align: center;
+    }
+    
+    .menu-link {
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 0;
+        border-radius: 8px; // เพิ่มความมนให้กับแต่ละเมนูไอเท็ม
+        text-decoration: none;
+        color: var(--text-color);
+        position: relative;
+        cursor: pointer !important;
+        transition: background-color .2s, box-shadow .2s;
+        width: 100%;
+        pointer-events: auto !important;
+        
+        &:hover {
+            background-color: var(--surface-hover);
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05); // เพิ่ม hover effect
+        }
+        
+        &.active-route {
+            background-color: var(--surface-hover);
+            color: var(--primary-color);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); // เพิ่ม shadow เมื่อ active
+            
+            .menu-icon {
+                color: var(--primary-color);
+            }
+        }
+    }
+    
+    .menu-icon {
+        font-size: 1.5rem;
+    }
+    
+    .menu-badge {
+        position: absolute;
+        top: 0;
+        right: 4px;
+        background-color: var(--primary-color);
+        color: var(--primary-color-text);
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+    }
+}
+
+// Override PrimeNG tooltip styles
+body .p-tooltip .p-tooltip-text {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+// Remove any CSS blocking pointer events
+.layout-mask {
+    pointer-events: none !important;
+}
+
+// Make sure menu items are clickable
+.menu-link,
+.menu-icon,
+.menu-badge {
+    pointer-events: auto !important;
+}
+
+// Responsive styles
+@media (max-width: 991px) {
+    .layout-sidebar {
+        width: 60px !important;
+        left: 0 !important;
+        top: 0 !important;
+        padding-top: 5rem;
+    }
+    
+    .layout-wrapper .layout-main-container {
+        margin-left: 60px !important;
+    }
 }
 
 .layout-menu {

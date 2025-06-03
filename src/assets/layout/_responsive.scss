@@ -41,7 +41,7 @@
 
         &.layout-static {
             .layout-main-container {
-                margin-left: 22rem;
+                margin-left: 80px; // แก้ไขจาก 22rem เป็น 80px
             }
 
             &.layout-static-inactive {
@@ -54,6 +54,12 @@
                     margin-left: 0;
                     padding-left: 2rem;
                 }
+            }
+        }
+
+        &.layout-static-slim {
+            .layout-main-container {
+                margin-left: 80px !important; // เพิ่มเพื่อรองรับ slim mode
             }
         }
 
@@ -70,11 +76,17 @@
 
     .layout-wrapper {
         .layout-main-container {
-            margin-left: 0;
+            margin-left: 60px !important;
             padding-left: 2rem;
         }
+        
+        &.layout-static-slim {
+            .layout-main-container {
+                margin-left: 60px !important;
+            }
+        }
 
-        .layout-sidebar {
+        .layout-sidebar, .layout-sidebar-slim {
             transform: translateX(-100%);
             left: 0;
             top: 0;
@@ -84,6 +96,11 @@
             transition:
                 transform 0.4s cubic-bezier(0.05, 0.74, 0.2, 0.99),
                 left 0.4s cubic-bezier(0.05, 0.74, 0.2, 0.99);
+        }
+        
+        .layout-sidebar-slim {
+            width: 60px; // ลดขนาดลงสำหรับอุปกรณ์มือถือ
+            transform: none; // ไม่ซ่อน sidebar
         }
 
         .layout-mask {
@@ -105,6 +122,20 @@
             .layout-mask {
                 display: block;
             }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .layout-wrapper {
+        &.layout-static-slim {
+            .layout-main-container {
+                margin-left: 60px; // สำหรับหน้าจอขนาดเล็กมาก
+            }
+        }
+        
+        .layout-sidebar-slim {
+            width: 60px;
         }
     }
 }
