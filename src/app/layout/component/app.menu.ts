@@ -40,7 +40,6 @@ import { RippleModule } from 'primeng/ripple';
                    tooltipPosition="right"
                    pRipple>
                     <i [class]="item.icon" class="menu-icon"></i>
-                    <span class="menu-badge" *ngIf="item.badge">{{item.badge}}</span>
                 </a>
             </li>
         </ul>
@@ -54,29 +53,19 @@ export class AppMenu implements OnInit {
     ngOnInit() {
         this.mainMenuItems = [
             {
-                label: 'Home',
+                label: 'Dashboard',
                 icon: 'pi pi-fw pi-home',
                 routerLink: ['/']
             },
             {
-                label: 'UI Components',
-                icon: 'pi pi-fw pi-box',
-                routerLink: ['/uikit']
+                label: 'Users',
+                icon: 'pi pi-fw pi-users',
+                routerLink: ['/users']
             },
             {
-                label: 'Dashboard',
-                icon: 'pi pi-fw pi-chart-line',
-                routerLink: ['/pages/dashboard']
-            },
-            {
-                label: 'Forms',
-                icon: 'pi pi-fw pi-id-card',
-                routerLink: ['/uikit/formlayout']
-            },
-            {
-                label: 'Tables',
-                icon: 'pi pi-fw pi-table',
-                routerLink: ['/uikit/table']
+                label: 'Reports',
+                icon: 'pi pi-fw pi-chart-bar',
+                routerLink: ['/reports']
             }
         ];
         
@@ -84,11 +73,12 @@ export class AppMenu implements OnInit {
             {
                 label: 'Settings',
                 icon: 'pi pi-fw pi-cog',
-                routerLink: ['/pages/settings']
+                routerLink: ['/settings']
             },
             {
                 label: 'Logout',
                 icon: 'pi pi-fw pi-sign-out',
+                routerLink: ['/auth/login']
             }
         ];
     }

@@ -11,17 +11,20 @@ import { LayoutService } from '../service/layout.service';
     selector: 'app-layout',
     standalone: true,
     imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
-    template: `<div class="layout-wrapper" [ngClass]="containerClass">
+    template: `
+    <div class="layout-wrapper" [ngClass]="containerClass">
         <app-topbar></app-topbar>
-        <app-sidebar></app-sidebar>
-        <div class="layout-main-container">
-            <div class="layout-main">
-                <router-outlet></router-outlet>
+        <div class="layout-content-wrapper">
+            <app-sidebar></app-sidebar>
+            <div class="layout-main-container">
+                <div class="layout-main">
+                    <router-outlet></router-outlet>
+                </div>
+                <app-footer></app-footer>
             </div>
-            <app-footer></app-footer>
         </div>
         <div class="layout-mask" (click)="hideMenu()"></div>
-    </div> `
+    </div>`
 })
 export class AppLayout implements OnDestroy {
     overlayMenuOpenSubscription: Subscription;
@@ -37,11 +40,8 @@ export class AppLayout implements OnDestroy {
         public renderer: Renderer2,
         public router: Router
     ) {
-        // เรียกใช้ setSlimMode เพื่อตั้งค่า menuMode เป็น slim
         this.layoutService.setSlimMode();
-        
-        // แก้ไขปัญหา error "Property 'subscribe' does not exist on type 'WritableSignal<LayoutState>'"
-        // โดยใช้ effect แทน subscribe
+
         effect(() => {
             const state = this.layoutService.layoutState();
             if (state.overlayMenuActive) {
@@ -52,13 +52,11 @@ export class AppLayout implements OnDestroy {
         });
 
         this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
-            // Always hide mobile menu on navigation
             if (this.layoutService.layoutState().staticMenuMobileActive) {
                 this.layoutService.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: false }));
             }
         });
         
-        // สร้าง Subscription เปล่าเพื่อให้ ngOnDestroy ทำงานได้
         this.overlayMenuOpenSubscription = new Subscription();
     }
 

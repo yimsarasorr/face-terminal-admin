@@ -31,7 +31,7 @@ export class LayoutService {
         primary: 'emerald',
         surface: null,
         darkTheme: false,
-        menuMode: 'slim' // เปลี่ยนจาก 'static' เป็น 'slim'
+        menuMode: 'slim'
     };
 
     _state: LayoutState = {

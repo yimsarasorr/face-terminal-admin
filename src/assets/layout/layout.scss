@@ -11,3 +11,49 @@
 @use './_responsive';
 @use './_utils';
 @use './_typography';
+
+.layout-wrapper {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+}
+
+.layout-content-wrapper {
+    display: flex;
+    flex: 1;
+    min-height: calc(100vh - 4rem);
+    padding: 0;
+    margin: 0;
+    gap: 0;
+    margin-top: 4rem;
+}
+
+.layout-main-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    padding: 1.5rem;
+    margin-left: var(--sidebar-width);
+    transition: margin-left .3s;
+}
+
+.layout-main {
+    flex: 1 1 auto;
+    padding-bottom: 1rem;
+}
+
+// สำหรับ mobile
+@media (max-width: 991px) {
+    .layout-main-container {
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .layout-main-container {
+        padding: 1rem;
+    }
+}
