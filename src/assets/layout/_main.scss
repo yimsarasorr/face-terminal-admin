@@ -4,7 +4,7 @@
     min-height: 100vh;
     justify-content: space-between;
     padding: 6rem 2rem 2rem 2rem;
-    margin-left: calc(80px + 1rem); // ความกว้าง sidebar + ระยะห่างจากขอบ
+    margin-left: calc(80px + 1rem);
     transition: margin-left var(--transition-duration);
 }
 
@@ -14,7 +14,7 @@
 
 @media (max-width: 991px) {
     .layout-main-container {
-        margin-left: calc(60px + 0.5rem); // ความกว้าง sidebar บนมือถือ + ระยะห่าง
+        margin-left: calc(60px + 0.5rem);
         padding: 4.5rem 1rem 1rem 1rem;
     }
 }

@@ -10,28 +10,49 @@ import { RippleModule } from 'primeng/ripple';
     standalone: true,
     imports: [CommonModule, RouterModule, TooltipModule, RippleModule],
     template: `
-    <ul class="layout-menu layout-menu-slim">
-        <li *ngFor="let item of model" class="menu-item">
-            <a 
-               [routerLink]="item.routerLink" 
-               routerLinkActive="active-route" 
-               [routerLinkActiveOptions]="{exact: true}"
-               class="menu-link"
-               [pTooltip]="item.label"
-               tooltipPosition="right"
-               pRipple>
-                <i [class]="item.icon" class="menu-icon"></i>
-                <span class="menu-badge" *ngIf="item.badge">{{item.badge}}</span>
-            </a>
-        </li>
-    </ul>
+    <div class="sidebar-content">
+        <!-- กลุ่มเมนูหลัก -->
+        <ul class="layout-menu layout-menu-slim">
+            <li *ngFor="let item of mainMenuItems" class="menu-item">
+                <a 
+                   [routerLink]="item.routerLink" 
+                   routerLinkActive="active-route" 
+                   [routerLinkActiveOptions]="{exact: true}"
+                   class="menu-link"
+                   [pTooltip]="item.label"
+                   tooltipPosition="right"
+                   pRipple>
+                    <i [class]="item.icon" class="menu-icon"></i>
+                    <span class="menu-badge" *ngIf="item.badge">{{item.badge}}</span>
+                </a>
+            </li>
+        </ul>
+        
+        <!-- กลุ่มเมนูด้านล่าง -->
+        <ul class="layout-menu layout-menu-slim bottom-menu">
+            <li *ngFor="let item of bottomMenuItems" class="menu-item">
+                <a 
+                   [routerLink]="item.routerLink" 
+                   routerLinkActive="active-route" 
+                   [routerLinkActiveOptions]="{exact: true}"
+                   class="menu-link"
+                   [pTooltip]="item.label"
+                   tooltipPosition="right"
+                   pRipple>
+                    <i [class]="item.icon" class="menu-icon"></i>
+                    <span class="menu-badge" *ngIf="item.badge">{{item.badge}}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
     `
 })
 export class AppMenu implements OnInit {
-    model: MenuItem[] = [];
+    mainMenuItems: MenuItem[] = [];
+    bottomMenuItems: MenuItem[] = [];
 
     ngOnInit() {
-        this.model = [
+        this.mainMenuItems = [
             {
                 label: 'Home',
                 icon: 'pi pi-fw pi-home',
@@ -56,11 +77,18 @@ export class AppMenu implements OnInit {
                 label: 'Tables',
                 icon: 'pi pi-fw pi-table',
                 routerLink: ['/uikit/table']
-            },
+            }
+        ];
+        
+        this.bottomMenuItems = [
             {
                 label: 'Settings',
                 icon: 'pi pi-fw pi-cog',
                 routerLink: ['/pages/settings']
+            },
+            {
+                label: 'Logout',
+                icon: 'pi pi-fw pi-sign-out',
             }
         ];
     }
