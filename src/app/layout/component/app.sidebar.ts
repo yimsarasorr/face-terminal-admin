@@ -10,6 +10,14 @@ import { RouterModule } from '@angular/router';
     imports: [CommonModule, AppMenu, RouterModule],
     template: `
         <div class="layout-sidebar">
+            <a routerLink="/home" class="sidebar-logo-link">
+                <div class="sidebar-header">
+                    <div class="logo-container">
+                        <img src="assets/images/logo.png" alt="Logo" class="app-logo">
+                    </div>
+                </div>
+            </a>
+            <div class="sidebar-divider"></div>
             <app-menu></app-menu>
         </div>
     `

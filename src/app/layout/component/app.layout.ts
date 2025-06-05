@@ -2,7 +2,6 @@ import { Component, OnDestroy, Renderer2, ViewChild, effect } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
-import { AppTopbar } from './app.topbar';
 import { AppSidebar } from './app.sidebar';
 import { AppFooter } from './app.footer';
 import { LayoutService } from '../service/layout.service';
@@ -10,10 +9,8 @@ import { LayoutService } from '../service/layout.service';
 @Component({
     selector: 'app-layout',
     standalone: true,
-    imports: [CommonModule, AppTopbar, AppSidebar, RouterModule, AppFooter],
-    template: `
-    <div class="layout-wrapper" [ngClass]="containerClass">
-        <app-topbar></app-topbar>
+    imports: [CommonModule, AppSidebar, RouterModule, AppFooter],
+    template: ` <div class="layout-wrapper" [ngClass]="containerClass">
         <div class="layout-content-wrapper">
             <app-sidebar></app-sidebar>
             <div class="layout-main-container">
@@ -32,8 +29,6 @@ export class AppLayout implements OnDestroy {
     menuOutsideClickListener: any;
 
     @ViewChild(AppSidebar) appSidebar!: AppSidebar;
-
-    @ViewChild(AppTopbar) appTopBar!: AppTopbar;
 
     constructor(
         public layoutService: LayoutService,
@@ -56,7 +51,7 @@ export class AppLayout implements OnDestroy {
                 this.layoutService.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: false }));
             }
         });
-        
+
         this.overlayMenuOpenSubscription = new Subscription();
     }
 

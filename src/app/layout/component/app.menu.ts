@@ -11,7 +11,6 @@ import { RippleModule } from 'primeng/ripple';
     imports: [CommonModule, RouterModule, TooltipModule, RippleModule],
     template: `
     <div class="sidebar-content">
-        <!-- กลุ่มเมนูหลัก -->
         <ul class="layout-menu layout-menu-slim">
             <li *ngFor="let item of mainMenuItems" class="menu-item">
                 <a 
@@ -27,6 +26,8 @@ import { RippleModule } from 'primeng/ripple';
                 </a>
             </li>
         </ul>
+        
+        <div class="sidebar-divider bottom-divider"></div>
         
         <!-- กลุ่มเมนูด้านล่าง -->
         <ul class="layout-menu layout-menu-slim bottom-menu">
@@ -60,12 +61,12 @@ export class AppMenu implements OnInit {
             {
                 label: 'Users',
                 icon: 'pi pi-fw pi-users',
-                routerLink: ['/users']
+                routerLink: ['/pages/users']
             },
             {
                 label: 'Reports',
                 icon: 'pi pi-fw pi-chart-bar',
-                routerLink: ['/reports']
+                routerLink: ['/pages/reports']
             }
         ];
         

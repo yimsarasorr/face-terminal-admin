@@ -72,10 +72,8 @@ export class LayoutService {
 
     getSurface = computed(() => this.layoutConfig().surface);
 
-    // Check if overlay mode is active
     isOverlay = computed(() => this.layoutConfig().menuMode === 'overlay');
     
-    // Check if slim mode is active
     isSlim = computed(() => this.layoutConfig().menuMode === 'slim');
 
     transitionComplete = signal<boolean>(false);
@@ -148,7 +146,6 @@ export class LayoutService {
     }
 
     onMenuToggle() {
-        // สำหรับ slim mode ไม่ต้องทำอะไร
         if (this.isSlim()) {
             return;
         }

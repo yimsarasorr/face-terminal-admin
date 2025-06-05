@@ -1,8 +1,46 @@
 @use 'mixins' as *;
 
+.sidebar-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem 0;
+    height: 4rem;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.app-logo {
+    max-width: 70%;
+    height: auto;
+    max-height: 40px;
+}
+
+.sidebar-logo-link {
+            text-decoration: none;
+            display: block;
+            cursor: pointer;
+        }
+
+        .sidebar-logo-link:hover {
+            opacity: 0.9;
+        }
+
+.sidebar-divider {
+    height: 1px;
+    background-color: var(--surface-border);
+    margin: 0.5rem 0;
+    opacity: 0.5;
+}
+
 .layout-content-wrapper {
     display: flex;
-    min-height: calc(100vh - 4rem);
+    min-height: 100vh;
     gap: 0;
     padding: 0;
     margin: 0;
@@ -21,12 +59,10 @@
     box-shadow: none;
     display: flex; 
     flex-direction: column;
-    
-    // ตั้งค่าให้เป็น fixed
     position: fixed;
     left: 0;
-    top: 4rem; // อยู่ใต้ topbar
-    height: calc(100vh - 4rem);
+    top: 0; // เปลี่ยนจาก 4rem เป็น 0
+    height: 100vh; // เปลี่ยนจาก calc(100vh - 4rem) เป็น 100vh
     
     z-index: 999;
     overflow-y: auto;
@@ -132,15 +168,15 @@ body .p-tooltip .p-tooltip-text {
 }
 
 .bottom-menu {
-    margin-top: auto !important; /* บังคับให้ bottom menu อยู่ด้านล่างสุด */
-    width: 100% !important; /* ให้ขยายเต็มความกว้าง */
+    margin-top: auto !important;
+    width: 100% !important;
     padding-top: 0.5rem !important;
     padding-bottom: 0.5rem !important;
     border-top: 1px solid rgba(0, 0, 0, 0.1) !important;
     background-color: var(--surface-card) !important;
-    z-index: 1000 !important; /* ให้อยู่ด้านบนสุดเมื่อมีการ scroll */
-    position: absolute !important; /* เพิ่มนี่เป็นแผนสำรอง */
-    bottom: 0 !important; /* ติดด้านล่าง */
+    z-index: 1000 !important;
+    position: absolute !important;
+    bottom: 0 !important;
     
     .menu-icon {
         font-size: 1.5rem;
