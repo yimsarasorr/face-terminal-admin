@@ -1,16 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReportFilters } from './components/report-filters';
+import { RouterModule } from '@angular/router';
 
 @Component({
     selector: 'app-reports',
     standalone: true,
-    imports: [CommonModule, ReportFilters],
+    imports: [CommonModule, RouterModule],
     template: `
         <div class="grid">
-            <!-- Filters Section -->
+            <!-- Content Section -->
             <div class="col-12">
-                <app-report-filters></app-report-filters>
+                <!-- ใช้ router-outlet เพื่อแสดงเนื้อหาของ child routes -->
+                <router-outlet></router-outlet>
             </div>
         </div>
     `

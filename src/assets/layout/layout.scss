@@ -37,6 +37,10 @@
     padding: 1.5rem;
     margin-left: var(--sidebar-width);
     transition: margin-left .3s;
+
+    &.has-submenu {
+        margin-left: calc(var(--sidebar-width) + 250px);
+    }
 }
 
 .layout-main {
@@ -48,6 +52,18 @@
 @media (max-width: 991px) {
     .layout-main-container {
         margin-left: 0;
+
+        &.has-submenu {
+            margin-left: 0;
+        }
+    }
+
+    .submenu-sidebar {
+        transform: translateX(-100%);
+    }
+
+    .submenu-sidebar-active {
+        transform: translateX(0);
     }
 }
 

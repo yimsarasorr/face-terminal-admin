@@ -1,11 +1,15 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-empty',
     standalone: true,
-    template: ` <div class="card">
-        <div class="font-semibold text-xl mb-4">Empty Page</div>
-        <p>Use this page to start from scratch and place your custom content.</p>
-    </div>`
+    imports: [CommonModule],
+    template: `
+        <div class="card">
+            <h5>เลือกรายงานจากเมนูด้านซ้าย</h5>
+            <p>กรุณาเลือกประเภทรายงานที่ต้องการจากเมนูด้านซ้ายเพื่อดูข้อมูล</p>
+        </div>
+    `
 })
 export class Empty {}

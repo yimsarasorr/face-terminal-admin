@@ -4,12 +4,23 @@ import { Crud } from './crud/crud';
 import { Empty } from './empty/empty';
 import { Users } from './Users/users';
 import { Reports } from './reports/reports';
+import { ReportFilters } from './reports/components/report-filters';
 
 export default [
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
-    { path: 'reports', component: Reports },
+    { 
+        path: 'reports',
+        component: Reports,
+        children: [
+            { path: '', component: Empty },
+            { path: 'visitors', component: ReportFilters },
+            { path: 'activity', component: Empty },
+            { path: 'logs', component: Empty },
+            { path: 'export', component: Empty }
+        ]
+    },
     { path: 'users', component: Users },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
