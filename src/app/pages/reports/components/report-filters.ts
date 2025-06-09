@@ -6,6 +6,9 @@ import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { CardModule } from 'primeng/card';
+import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
+import { ChartModule } from 'primeng/chart';
 
 interface ReportType {
     name: string;
@@ -15,6 +18,16 @@ interface ReportType {
 interface Location {
     name: string;
     code: string;
+}
+
+interface VisitorData {
+    id: number;
+    name: string;
+    checkIn: string;
+    checkOut: string;
+    location: string;
+    purpose: string;
+    host: string;
 }
 
 @Component({
@@ -27,9 +40,13 @@ interface Location {
         DropdownModule,
         ButtonModule,
         MultiSelectModule,
-        CardModule
+        CardModule,
+        DialogModule,
+        TableModule,
+        ChartModule
     ],
     template: `
+        <!-- Card ฟิลเตอร์ -->
         <div class="card">
             <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                 <h5 class="m-0 font-semibold text-xl">Visitor Reports</h5>
@@ -83,7 +100,7 @@ interface Location {
                     <button pButton label="Apply Filters" 
                         icon="pi pi-search" 
                         class="w-full mt-4 md:mt-0" 
-                        (click)="applyFilters()"></button>
+                        (click)="showReport()"></button>
                 </div>
                 
                 <!-- Reset Button -->
@@ -95,15 +112,85 @@ interface Location {
                 </div>
             </div>
         </div>
-    `
+        
+        <!-- Dialog แสดงผล filter แบบเต็มหน้าจอ -->
+        <p-dialog 
+            [(visible)]="displayReportDialog" 
+            [modal]="true" 
+            [style]="{width: '100vw', height: '100vh'}" 
+            [contentStyle]="{height: 'calc(100vh - 145px)', overflow: 'auto'}" 
+            [baseZIndex]="10000"
+            [showHeader]="true"
+            [draggable]="false"
+            [resizable]="false"
+            [closable]="true"
+            styleClass="fullscreen-dialog"
+            header="Filter Summary">
+            
+            <div class="p-fluid">
+                <h5>Selected Filters</h5>
+                
+                <div class="field">
+                    <label class="font-medium">Date Range:</label>
+                    <div>{{ formatDateRange() }}</div>
+                </div>
+                
+                <div class="field">
+                    <label class="font-medium">Report Type:</label>
+                    <div>{{ selectedReportType?.name || 'All Types' }}</div>
+                </div>
+                
+                <div class="field">
+                    <label class="font-medium">Locations:</label>
+                    <div *ngIf="selectedLocations.length === 0">All Locations</div>
+                    <ul *ngIf="selectedLocations.length > 0" class="m-0 p-0 list-none">
+                        <li *ngFor="let location of selectedLocations" class="mb-2">
+                            {{ location.name }}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <ng-template pTemplate="footer">
+                <button pButton label="Close" icon="pi pi-times" 
+                    (click)="displayReportDialog = false" 
+                    class="p-button-text"></button>
+            </ng-template>
+        </p-dialog>
+    `,
+    styles: [`
+        :host ::ng-deep .fullscreen-dialog {
+            margin: 0 !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: 100vw !important;
+            max-height: 100vh !important;
+        }
+        
+        :host ::ng-deep .fullscreen-dialog .p-dialog-content {
+            padding: 1.5rem;
+        }
+        
+        :host ::ng-deep .fullscreen-dialog .p-dialog-header {
+            padding-top: 1rem;
+        }
+        
+        :host ::ng-deep .fullscreen-dialog .p-dialog-footer {
+            padding: 1rem 1.5rem;
+        }
+    `]
 })
 export class ReportFilters {
     today: Date = new Date();
+    currentDate: Date = new Date();
     dateRange: Date[] | undefined;
     reportTypes: ReportType[];
     selectedReportType: ReportType | null = null;
     locations: Location[];
     selectedLocations: Location[] = [];
+    displayReportDialog: boolean = false;
 
     constructor() {
         const today = new Date();
@@ -127,13 +214,8 @@ export class ReportFilters {
         ];
     }
 
-    applyFilters() {
-        console.log('Applying filters with:', {
-            dateRange: this.dateRange,
-            reportType: this.selectedReportType,
-            locations: this.selectedLocations
-        });
-
+    showReport() {
+        this.displayReportDialog = true;
     }
 
     resetFilters() {
@@ -146,5 +228,16 @@ export class ReportFilters {
         this.selectedLocations = [];
 
         console.log('Filters reset');
+    }
+
+    formatDateRange(): string {
+        if (!this.dateRange || this.dateRange.length < 2) {
+            return 'All dates';
+        }
+        
+        const startDate = this.dateRange[0].toLocaleDateString();
+        const endDate = this.dateRange[1].toLocaleDateString();
+        
+        return `${startDate} - ${endDate}`;
     }
 }
