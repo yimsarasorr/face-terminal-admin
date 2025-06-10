@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Type } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
@@ -9,6 +9,7 @@ import { CardModule } from 'primeng/card';
 import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { ChartModule } from 'primeng/chart';
+import { ReportDetailComponent } from './report-detail.component';
 
 interface ReportType {
     name: string;
@@ -43,10 +44,10 @@ interface VisitorData {
         CardModule,
         DialogModule,
         TableModule,
-        ChartModule
+        ChartModule,
+        ReportDetailComponent
     ],
     template: `
-        <!-- Card ฟิลเตอร์ -->
         <div class="card">
             <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                 <h5 class="m-0 font-semibold text-xl">Visitor Reports</h5>
@@ -113,7 +114,8 @@ interface VisitorData {
             </div>
         </div>
         
-        <!-- Dialog แสดงผล filter แบบเต็มหน้าจอ -->
+        <app-report-detail style="display:none;"></app-report-detail>
+        
         <p-dialog 
             [(visible)]="displayReportDialog" 
             [modal]="true" 
@@ -127,29 +129,7 @@ interface VisitorData {
             styleClass="fullscreen-dialog"
             header="Filter Summary">
             
-            <div class="p-fluid">
-                <h5>Selected Filters</h5>
-                
-                <div class="field">
-                    <label class="font-medium">Date Range:</label>
-                    <div>{{ formatDateRange() }}</div>
-                </div>
-                
-                <div class="field">
-                    <label class="font-medium">Report Type:</label>
-                    <div>{{ selectedReportType?.name || 'All Types' }}</div>
-                </div>
-                
-                <div class="field">
-                    <label class="font-medium">Locations:</label>
-                    <div *ngIf="selectedLocations.length === 0">All Locations</div>
-                    <ul *ngIf="selectedLocations.length > 0" class="m-0 p-0 list-none">
-                        <li *ngFor="let location of selectedLocations" class="mb-2">
-                            {{ location.name }}
-                        </li>
-                    </ul>
-                </div>
-            </div>
+            <ng-container *ngComponentOutlet="dialogComponent; inputs: dialogInputs"></ng-container>
             
             <ng-template pTemplate="footer">
                 <button pButton label="Close" icon="pi pi-times" 
@@ -191,6 +171,9 @@ export class ReportFilters {
     locations: Location[];
     selectedLocations: Location[] = [];
     displayReportDialog: boolean = false;
+    
+    dialogComponent: Type<any> = ReportDetailComponent;
+    dialogInputs: Record<string, unknown> = {};
 
     constructor() {
         const today = new Date();
@@ -215,6 +198,12 @@ export class ReportFilters {
     }
 
     showReport() {
+        this.dialogInputs = {
+            dateRangeText: this.formatDateRange(),
+            reportType: this.selectedReportType,
+            locations: this.selectedLocations
+        };
+        
         this.displayReportDialog = true;
     }
 

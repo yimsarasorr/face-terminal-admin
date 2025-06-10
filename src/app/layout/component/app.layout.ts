@@ -11,14 +11,11 @@ import { AppSubmenuSidebar } from './app.submenu-sidebar';
     standalone: true,
     imports: [CommonModule, AppSidebar, RouterModule, AppSubmenuSidebar],
     template: ` <div class="layout-wrapper" [ngClass]="containerClass">
-        <!-- ลบ app-topbar ออกจากเทมเพลต -->
         <app-sidebar></app-sidebar>
-
-        <!-- เพิ่ม submenu sidebar สำหรับหน้าที่ต้องการ -->
         <app-submenu-sidebar *ngIf="hasSubmenu()" 
-            [items]="reportsSubmenuItems" 
-            title="Reports" 
-            subtitle="Analyze your data">
+            [items]="currentSubmenuItems" 
+            [title]="currentSubmenuTitle" 
+            [subtitle]="currentSubmenuSubtitle">
         </app-submenu-sidebar>
         
         <div class="layout-main-container" [ngClass]="{'has-submenu': hasSubmenu()}">
@@ -35,6 +32,10 @@ export class AppLayout implements OnDestroy, OnInit {
     @ViewChild(AppSidebar) appSidebar!: AppSidebar;
     
     hasSubmenu = signal(false);
+    
+    currentSubmenuItems: any[] = [];
+    currentSubmenuTitle: string = '';
+    currentSubmenuSubtitle: string = '';
     
     reportsSubmenuItems = [
         {
@@ -56,6 +57,24 @@ export class AppLayout implements OnDestroy, OnInit {
             label: 'Export Data',
             icon: 'pi pi-download',
             routerLink: ['/reports/export']
+        }
+    ];
+    
+    usersSubmenuItems = [
+        {
+            label: 'User Management',
+            icon: 'pi pi-user-edit',
+            routerLink: ['/pages/users/management']
+        },
+        {
+            label: 'User List',
+            icon: 'pi pi-list',
+            routerLink: ['/pages/users/list']
+        },
+        {
+            label: 'Add User',
+            icon: 'pi pi-user-plus',
+            routerLink: ['/pages/users/add']
         }
     ];
 
@@ -84,17 +103,30 @@ export class AppLayout implements OnDestroy, OnInit {
         this.overlayMenuOpenSubscription = new Subscription();
     }
 
-    // เพิ่มเมธอดสำหรับตรวจสอบ route
     checkRouteForSubmenu(url: string) {
-        // ถ้าเป็นหน้า reports จะแสดง submenu
-        this.hasSubmenu.set(url.includes('/reports'));
+        if (url.includes('/reports')) {
+            this.hasSubmenu.set(true);
+            this.currentSubmenuItems = this.reportsSubmenuItems;
+            this.currentSubmenuTitle = 'Reports';
+            this.currentSubmenuSubtitle = 'Analyze your data';
+        } 
+        else if (url.includes('/users')) {
+            this.hasSubmenu.set(true);
+            this.currentSubmenuItems = this.usersSubmenuItems;
+            this.currentSubmenuTitle = 'User Management';
+            this.currentSubmenuSubtitle = 'Manage system users';
+        }
+        else {
+            this.hasSubmenu.set(false);
+        }
     }
 
-    // ติดตามการเปลี่ยนแปลง route
     ngOnInit() {
-        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: NavigationEnd) => {
+        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((event: any) => {
             this.checkRouteForSubmenu(event.url);
         });
+        
+        this.checkRouteForSubmenu(this.router.url);
     }
 
     isOutsideClicked(event: MouseEvent) {
@@ -126,7 +158,7 @@ export class AppLayout implements OnDestroy, OnInit {
             'p-input-filled': true,
             'p-ripple-disabled': false,
             'layout-static-slim': true,
-            'submenu-sidebar-active': this.hasSubmenu // เพิ่มคลาสสำหรับหน้าที่มี submenu
+            'submenu-sidebar-active': this.hasSubmenu
         };
     }
 

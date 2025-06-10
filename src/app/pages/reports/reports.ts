@@ -10,7 +10,6 @@ import { RouterModule } from '@angular/router';
         <div class="grid">
             <!-- Content Section -->
             <div class="col-12">
-                <!-- ใช้ router-outlet เพื่อแสดงเนื้อหาของ child routes -->
                 <router-outlet></router-outlet>
             </div>
         </div>

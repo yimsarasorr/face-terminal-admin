@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { Documentation } from './documentation/documentation';
 import { Crud } from './crud/crud';
 import { Empty } from './empty/empty';
-import { Users } from './Users/users';
 import { Reports } from './reports/reports';
 import { ReportFilters } from './reports/components/report-filters';
 
@@ -21,6 +20,9 @@ export default [
             { path: 'export', component: Empty }
         ]
     },
-    { path: 'users', component: Users },
+    { 
+        path: 'users',
+        loadChildren: () => import('./Users/users-routing.module').then(m => m.UsersRoutingModule)
+    },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
