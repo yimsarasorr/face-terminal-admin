@@ -37,6 +37,7 @@ import { ButtonModule } from 'primeng/button';
             padding: 0 1.5rem;
             border-top: 1px solid var(--surface-border);
             border-bottom: 1px solid var(--surface-border);
+            border-left: 1px solid var(--surface-border);
         }
         
         .page-header-content {

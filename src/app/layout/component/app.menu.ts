@@ -74,7 +74,7 @@ export class AppMenu implements OnInit {
             {
                 label: 'Settings',
                 icon: 'pi pi-fw pi-cog',
-                routerLink: ['/settings']
+                routerLink: ['pages/settings']
             },
             {
                 label: 'Logout',

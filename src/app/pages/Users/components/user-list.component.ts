@@ -22,10 +22,6 @@ import { UserService } from '../services/user.service';
     <div class="card">
         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
             <h5 class="m-0 font-semibold text-xl">{{ title }}</h5>
-            <span class="block mt-3 md:mt-0 p-input-icon-left">
-                <i class="pi pi-search"></i>
-                <input type="text" pInputText placeholder="Search..." (input)="applyFilterGlobal($event, 'contains')"/>
-            </span>
         </div>
         
         <p-table

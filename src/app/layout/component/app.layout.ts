@@ -46,17 +46,17 @@ export class AppLayout implements OnDestroy, OnInit {
         {
             label: 'User Activity',
             icon: 'pi pi-users',
-            routerLink: ['/reports/activity']
+            routerLink: ['pages/reports/activity']
         },
         {
             label: 'System Logs',
             icon: 'pi pi-list',
-            routerLink: ['/reports/logs']
+            routerLink: ['pages/reports/logs']
         },
         {
             label: 'Export Data',
             icon: 'pi pi-download',
-            routerLink: ['/reports/export']
+            routerLink: ['pages/reports/export']
         }
     ];
     

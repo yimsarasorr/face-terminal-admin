@@ -10,6 +10,7 @@ import { DialogModule } from 'primeng/dialog';
 import { TableModule } from 'primeng/table';
 import { ChartModule } from 'primeng/chart';
 import { ReportDetailComponent } from './report-detail.component';
+import { ReportDialogComponent } from './report-dialog.component';
 
 interface ReportType {
     name: string;
@@ -45,7 +46,8 @@ interface VisitorData {
         DialogModule,
         TableModule,
         ChartModule,
-        ReportDetailComponent
+        ReportDetailComponent,
+        ReportDialogComponent
     ],
     template: `
         <div class="card">
@@ -62,7 +64,7 @@ interface VisitorData {
                     </div>
                 </span>
             </div>
-            
+            <app-report-detail style="display:none;"></app-report-detail>
             <div class="grid mt-4">
                 <!-- Date Range -->
                 <div class="col-12 md:col-4 lg:col-3">
@@ -114,29 +116,12 @@ interface VisitorData {
             </div>
         </div>
         
-        <app-report-detail style="display:none;"></app-report-detail>
-        
-        <p-dialog 
-            [(visible)]="displayReportDialog" 
-            [modal]="true" 
-            [style]="{width: '100vw', height: '100vh'}" 
-            [contentStyle]="{height: 'calc(100vh - 145px)', overflow: 'auto'}" 
-            [baseZIndex]="10000"
-            [showHeader]="true"
-            [draggable]="false"
-            [resizable]="false"
-            [closable]="true"
-            styleClass="fullscreen-dialog"
-            header="Filter Summary">
-            
-            <ng-container *ngComponentOutlet="dialogComponent; inputs: dialogInputs"></ng-container>
-            
-            <ng-template pTemplate="footer">
-                <button pButton label="Close" icon="pi pi-times" 
-                    (click)="displayReportDialog = false" 
-                    class="p-button-text"></button>
-            </ng-template>
-        </p-dialog>
+        <app-report-dialog
+            [(visible)]="displayReportDialog"
+            [header]="'Filter Summary'"
+            [dialogComponent]="dialogComponent"
+            [dialogInputs]="dialogInputs">
+        </app-report-dialog>
     `,
     styles: [`
         :host ::ng-deep .fullscreen-dialog {
