@@ -1,4 +1,5 @@
-import { Component, Type } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Component, Type, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
@@ -11,6 +12,10 @@ import { CardModule } from 'primeng/card';
 import { ReportDetailComponent } from './report-detail.component';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ReportDialogComponent } from './report-dialog.component';
+
+// สร้าง placeholder component เพื่อใช้เป็นค่าเริ่มต้นที่ถูกต้องตาม type
+@Component({ template: '' })
+class PlaceholderComponent {}
 
 interface UserActivity {
     id: number;
@@ -54,10 +59,14 @@ interface ReportType {
         ReportDialogComponent
     ],
     template: `
-        <div class="card">
-            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+        <div class="card" [ngClass]="{'p-0 border-none': isDialogMode}">
+            <div *ngIf="!isDialogMode" class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                 <h5 class="m-0 font-semibold text-xl">User Activity Log</h5>
                 <div class="flex gap-2 mt-3 md:mt-0 ml-auto">
+                    <!-- เพิ่มปุ่ม Visitor Reports -->
+                    <button pButton icon="pi pi-chart-line" label="Visitor Reports" 
+                        (click)="openVisitorDialog()" 
+                        class="p-button-outlined p-button-help"></button>
                     <button pButton icon="pi pi-filter" label="Show Filters" 
                         (click)="showFilters()" 
                         class="p-button-outlined"></button>
@@ -67,7 +76,7 @@ interface ReportType {
                 </div>
             </div>
             
-            <div class="mt-3" *ngIf="filtersVisible">
+            <div class="mt-3" *ngIf="filtersVisible && !isDialogMode">
                 <div class="p-card p-3">
                     <div class="grid">
                         <!-- Date Range Filter -->
@@ -119,7 +128,7 @@ interface ReportType {
 
             <app-report-detail style="display:none;"></app-report-detail>
             
-            <!-- Activity Table -->
+            <!-- Activity Table - แสดงในทุกโหมด -->
             <div class="mt-4">
                 <p-table [value]="filteredActivities" [paginator]="true" [rows]="10" 
                     [rowsPerPageOptions]="[5,10,25,50]" [showCurrentPageReport]="true" 
@@ -151,15 +160,31 @@ interface ReportType {
                             </td>
                         </tr>
                     </ng-template>
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="5" class="text-center p-4">
+                                No activity records found.
+                            </td>
+                        </tr>
+                    </ng-template>
                 </p-table>
             </div>
         </div>
         
-        <app-report-dialog
+        <app-report-dialog *ngIf="!isDialogMode"
             [(visible)]="displayReportDialog"
             [header]="'Activity Report Summary'"
             [dialogComponent]="dialogComponent"
             [dialogInputs]="dialogInputs">
+        </app-report-dialog>
+        
+        <!-- เพิ่ม dialog สำหรับ Visitor Reports -->
+        <app-report-dialog
+            [(visible)]="displayVisitorDialog"
+            [header]="'Visitor Reports'"
+            [dialogComponent]="visitorDialogComponent"
+            [dialogInputs]="visitorDialogInputs"
+            (visibleChange)="onVisitorDialogClose()">
         </app-report-dialog>
     `,
     styles: [`
@@ -178,7 +203,10 @@ interface ReportType {
         }
     `]
 })
-export class ActivityReport {
+export class ActivityReport implements OnChanges {
+    @Input() initialFilters: any;
+    @Input() isDialogMode: boolean = false;
+    
     today: Date = new Date();
     dateRange: Date[] | undefined;
     usernameFilter: string = '';
@@ -218,13 +246,57 @@ export class ActivityReport {
         locations: []
     };
 
-    constructor() {
+    // เพิ่มตัวแปรสำหรับ dialog ของ Report Filters และใช้ placeholder component เป็นค่าเริ่มต้น
+    displayVisitorDialog: boolean = false;
+    visitorDialogComponent: Type<any> = PlaceholderComponent;
+    visitorDialogInputs: Record<string, unknown> = {};
+
+    constructor(
+        private router: Router,
+        private route: ActivatedRoute
+    ) {
         const today = new Date();
         const prevWeek = new Date();
         prevWeek.setDate(prevWeek.getDate() - 7);
         this.dateRange = [prevWeek, today];
         this.generateSampleData();
         this.applyFilters();
+        
+        // ใช้ dynamic import เพื่อโหลด ReportFilters component
+        import('./report-filters').then(module => {
+            // เมื่อโหลดสำเร็จ จึงกำหนดค่าให้กับ visitorDialogComponent
+            this.visitorDialogComponent = module.ReportFilters;
+        }).catch(error => {
+            console.error('Failed to load ReportFilters component:', error);
+        });
+        
+        // ตรวจสอบ query params
+        this.route.queryParams.subscribe(params => {
+            if (params['dialog'] === 'visitor') {
+                this.showVisitorReport();
+            }
+        });
+    }
+    
+    ngOnChanges(changes: SimpleChanges): void {
+        if (changes['initialFilters'] && changes['initialFilters'].currentValue) {
+            const filters = changes['initialFilters'].currentValue;
+            
+            // ปรับค่าตามที่ได้รับ
+            if (filters.dateRange) {
+                this.dateRange = filters.dateRange;
+            }
+            
+            if (filters.locations && filters.locations.length > 0) {
+                const locationNames = filters.locations.map((loc: any) => loc.name);
+                if (locationNames.length > 0) {
+                    this.usernameFilter = locationNames.join(', ');
+                }
+            }
+            
+            // อัพเดทการกรอง
+            this.applyFilters();
+        }
     }
     
     generateSampleData() {
@@ -262,20 +334,16 @@ export class ActivityReport {
             });
         }
         
-        // เรียงตามเวลาล่าสุดก่อน
         this.activities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     }
     
-    // แสดง/ซ่อนแผงตัวกรอง
     showFilters() {
         this.filtersVisible = !this.filtersVisible;
     }
     
-    // นำตัวกรองมาใช้กับข้อมูล
     applyFilters() {
         this.filteredActivities = [...this.activities];
         
-        // กรองตามวันที่
         if (this.dateRange && this.dateRange.length === 2) {
             const startDate = new Date(this.dateRange[0]);
             startDate.setHours(0, 0, 0, 0);
@@ -289,21 +357,18 @@ export class ActivityReport {
             });
         }
         
-        // กรองตามชื่อผู้ใช้
         if (this.usernameFilter) {
             this.filteredActivities = this.filteredActivities.filter(item =>
                 item.username.toLowerCase().includes(this.usernameFilter.toLowerCase())
             );
         }
         
-        // กรองตามประเภทการกระทำ
         if (this.selectedAction) {
             this.filteredActivities = this.filteredActivities.filter(item =>
                 item.action === this.selectedAction.value
             );
         }
         
-        // กรองตามสถานะ
         if (this.selectedStatus) {
             this.filteredActivities = this.filteredActivities.filter(item =>
                 item.status === this.selectedStatus.value
@@ -311,7 +376,6 @@ export class ActivityReport {
         }
     }
     
-    // รีเซ็ตตัวกรอง
     resetFilters() {
         const today = new Date();
         const prevWeek = new Date();
@@ -325,9 +389,7 @@ export class ActivityReport {
         this.filteredActivities = [...this.activities];
     }
     
-    // แสดงรายงานในหน้าต่าง Dialog
     showReport() {
-        // สร้าง object ใหม่แทนการแก้ไข property
         this.dialogInputs = {
             dateRangeText: this.formatDateRange(),
             reportType: {
@@ -337,7 +399,6 @@ export class ActivityReport {
             locations: []
         };
         
-        // สร้าง locations array ใหม่ตามเงื่อนไข
         const locations: Location[] = [];
         
         if (this.selectedAction) {
@@ -361,13 +422,11 @@ export class ActivityReport {
             });
         }
         
-        // กำหนดค่า locations หลังจากสร้างเสร็จ
         this.dialogInputs.locations = locations;
         
         this.displayReportDialog = true;
     }
     
-    // ฟอร์แมตช่วงวันที่เป็นข้อความ
     formatDateRange(): string {
         if (!this.dateRange || this.dateRange.length < 2) {
             return 'All dates';
@@ -377,5 +436,42 @@ export class ActivityReport {
         const endDate = this.dateRange[1].toLocaleDateString();
         
         return `${startDate} - ${endDate}`;
+    }
+
+    // เพิ่มฟังก์ชันเปิด Report Filters dialog
+    openVisitorDialog() {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { dialog: 'visitor' },
+            queryParamsHandling: 'merge'
+        });
+    }
+    
+    // เพิ่มฟังก์ชันแสดง Visitor Report Dialog
+    showVisitorReport() {
+        this.visitorDialogInputs = {
+            initialFilters: {
+                dateRange: this.dateRange,
+                // ส่งข้อมูลเพิ่มเติมที่จำเป็น
+                username: this.usernameFilter,
+                action: this.selectedAction?.value,
+                status: this.selectedStatus?.value
+            },
+            isDialogMode: true
+        };
+        
+        this.displayVisitorDialog = true;
+    }
+    
+    // เพิ่มฟังก์ชันปิด dialog
+    onVisitorDialogClose() {
+        this.displayVisitorDialog = false;
+        
+        // ลบ dialog param ออกจาก URL
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { dialog: null },
+            queryParamsHandling: 'merge'
+        });
     }
 }

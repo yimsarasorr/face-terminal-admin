@@ -1,4 +1,5 @@
-import { Component, Type } from '@angular/core';
+import { Component, Type, OnInit, Input } from '@angular/core';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CalendarModule } from 'primeng/calendar';
@@ -11,6 +12,7 @@ import { TableModule } from 'primeng/table';
 import { ChartModule } from 'primeng/chart';
 import { ReportDetailComponent } from './report-detail.component';
 import { ReportDialogComponent } from './report-dialog.component';
+import { ActivityReport } from './activity-report';
 
 interface ReportType {
     name: string;
@@ -50,19 +52,17 @@ interface VisitorData {
         ReportDialogComponent
     ],
     template: `
-        <div class="card">
-            <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
+        <div class="card" [ngClass]="{'p-0 border-none': isDialogMode}">
+            <div *ngIf="!isDialogMode" class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
                 <h5 class="m-0 font-semibold text-xl">Visitor Reports</h5>
-                <span class="block mt-3 md:mt-0 p-input-icon-left">
-                    <div class="flex gap-2 flex-wrap">
-                        <button pButton icon="pi pi-file-excel" 
-                            label="Export Excel" 
-                            class="p-button-outlined p-button-success"></button>
-                        <button pButton icon="pi pi-file-pdf" 
-                            label="Export PDF" 
-                            class="p-button-outlined p-button-danger"></button>
+                <div class="block mt-3 md:mt-0 ml-auto">
+                    <div class="flex justify-content-end">
+                        <button pButton icon="pi pi-users" 
+                            label="User Activity" 
+                            class="p-button-outlined p-button-primary"
+                            (click)="openActivityDialog()"></button>
                     </div>
-                </span>
+                </div>
             </div>
             <app-report-detail style="display:none;"></app-report-detail>
             <div class="grid mt-4">
@@ -116,11 +116,13 @@ interface VisitorData {
             </div>
         </div>
         
+        <!-- เพิ่ม dialog สำหรับ activity -->
         <app-report-dialog
-            [(visible)]="displayReportDialog"
-            [header]="'Filter Summary'"
-            [dialogComponent]="dialogComponent"
-            [dialogInputs]="dialogInputs">
+            [(visible)]="displayActivityDialog"
+            [header]="'User Activity'"
+            [dialogComponent]="activityComponent"
+            [dialogInputs]="activityInputs"
+            (visibleChange)="onActivityDialogClose()">
         </app-report-dialog>
     `,
     styles: [`
@@ -147,7 +149,10 @@ interface VisitorData {
         }
     `]
 })
-export class ReportFilters {
+export class ReportFilters implements OnInit {
+    @Input() isDialogMode: boolean = false; // เพิ่ม property นี้
+    @Input() initialFilters: any; // เพิ่ม property นี้
+
     today: Date = new Date();
     currentDate: Date = new Date();
     dateRange: Date[] | undefined;
@@ -156,11 +161,17 @@ export class ReportFilters {
     locations: Location[];
     selectedLocations: Location[] = [];
     displayReportDialog: boolean = false;
+    displayActivityDialog: boolean = false;
     
     dialogComponent: Type<any> = ReportDetailComponent;
     dialogInputs: Record<string, unknown> = {};
+    activityComponent: Type<any> = ActivityReport;
+    activityInputs: Record<string, unknown> = {};
 
-    constructor() {
+    constructor(
+        private router: Router,
+        private route: ActivatedRoute
+    ) {
         const today = new Date();
         const prevMonth = new Date();
         prevMonth.setDate(prevMonth.getDate() - 30);
@@ -180,6 +191,55 @@ export class ReportFilters {
             { name: 'Staff Entrance', code: 'staff-gate' },
             { name: 'VIP Gate', code: 'vip-gate' }
         ];
+    }
+
+    ngOnInit() {
+        // ตรวจสอบ query params เมื่อ component โหลด
+        this.route.queryParams.subscribe(params => {
+            if (params['dialog'] === 'activity') {
+                this.showUserActivity();
+            }
+        });
+        
+        // ตรวจสอบค่าเริ่มต้นจาก initialFilters
+        if (this.initialFilters) {
+            if (this.initialFilters.dateRange) {
+                this.dateRange = this.initialFilters.dateRange;
+            }
+            // รับค่าอื่นๆ ตามต้องการ
+        }
+    }
+    
+    openActivityDialog() {
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { dialog: 'activity' },
+            queryParamsHandling: 'merge'
+        });
+    }
+    
+    showUserActivity() {
+        this.activityInputs = {
+            initialFilters: {
+                dateRange: this.dateRange,
+                locations: this.selectedLocations,
+                reportType: this.selectedReportType
+            },
+            isDialogMode: true
+        };
+        
+        this.activityComponent = ActivityReport;
+        this.displayActivityDialog = true;
+    }
+    
+    onActivityDialogClose() {
+        this.displayActivityDialog = false;
+        
+        this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: { dialog: null },
+            queryParamsHandling: 'merge'
+        });
     }
 
     showReport() {
