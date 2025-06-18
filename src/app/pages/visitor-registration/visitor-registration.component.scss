@@ -1,0 +1,13 @@
+:host ::ng-deep {
+    .vertical-steps {
+        .p-steps-list {
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .p-steps-item {
+            flex-grow: 0;
+            width: 100%;
+        }
+    }
+}

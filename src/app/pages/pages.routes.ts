@@ -5,7 +5,6 @@ import { Empty } from './empty/empty';
 import { Reports } from './reports/reports';
 import { ReportFilters } from './reports/components/report-filters';
 import { ActivityReport } from './reports/components/activity-report';
-import { LogsReport } from './reports/components/logs-report';
 import { Settings } from './settings/settings';
 
 export default [
@@ -20,7 +19,7 @@ export default [
             { path: '', component: Empty },
             { path: 'visitors', component: ReportFilters },
             { path: 'activity', component: ActivityReport },
-            { path: 'logs', component: LogsReport },
+            { path: 'logs', component: Empty },
             { path: 'export', component: Empty }
         ]
     },

@@ -1,0 +1,24 @@
+<div class="flex flex-col h-full">
+    <div class="flex-grow p-8 flex flex-col items-center justify-center" [formGroup]="form">
+        <div class="mb-8">
+            <h3 class="text-xl font-semibold">กรุณาเลือกอาคารที่ต้องการเข้า</h3>
+        </div>
+        <div class="flex flex-col gap-4">
+            <div class="flex items-center">
+                <p-radioButton name="building" value="A" formControlName="building" inputId="b-a"></p-radioButton>
+                <label for="b-a" class="ml-2">ตึก A</label>
+            </div>
+            <div class="flex items-center">
+                <p-radioButton name="building" value="B" formControlName="building" inputId="b-b"></p-radioButton>
+                <label for="b-b" class="ml-2">ตึก B</label>
+            </div>
+            <div class="flex items-center">
+                <p-radioButton name="building" value="C" formControlName="building" inputId="b-c"></p-radioButton>
+                <label for="b-c" class="ml-2">ตึก C</label>
+            </div>
+        </div>
+    </div>
+    <div class="p-4 border-t flex justify-end">
+        <p-button label="ถัดไป" icon="pi pi-arrow-right" iconPos="right" (click)="onNext()" [disabled]="form.invalid"></p-button>
+    </div>
+</div>

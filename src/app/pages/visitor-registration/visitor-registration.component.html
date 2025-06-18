@@ -1,0 +1,28 @@
+<div class="flex flex-col h-full">
+
+    <div class="flex-shrink-0 p-4 border-b flex justify-between items-center">
+        <h2 class="text-2xl font-bold">{{ (currentStep$ | async)?.title }}</h2>
+        <p-button icon="pi pi-times" severity="danger" [text]="true" (click)="onCancel()"></p-button>
+    </div>
+
+    <div class="flex flex-grow overflow-auto">
+        <div class="w-1/8 p-4 border-r bg-gray-50 flex-shrink-0">
+            <p-steps 
+                [model]="(steps$ | async)!" 
+                [activeIndex]="(activeIndex$ | async) ?? 0"
+                (activeIndexChange)="onStepChange($event)"
+                [readonly]="false"
+                styleClass="vertical-steps">
+            </p-steps>
+        </div>
+
+        <div class="w-2/8 flex-grow">
+            <div [ngSwitch]="(currentStep$ | async)?.id" class="h-full">
+                <app-select-building *ngSwitchCase="'select-building'" (next)="onNextStep($event)"></app-select-building>
+                <app-visitor-form *ngSwitchCase="'visitor-form'" (next)="onNextStep($event)" (back)="onPreviousStep()"></app-visitor-form>
+                <app-summary *ngSwitchCase="'summary'" [data]="visitorData" (confirm)="onConfirmRegistration()" (back)="onPreviousStep()"></app-summary>
+            </div>
+        </div>
+    </div>
+
+</div>
