@@ -27,14 +27,14 @@ import { Subscription } from 'rxjs';
 
       <ng-container *ngIf="component" [ngComponentOutlet]="component" [ngComponentOutletInputs]="inputs"></ng-container>
       
-      <ng-template pTemplate="footer">
+      <!-- <ng-template pTemplate="footer">
         <button pButton label="ปิด" icon="pi pi-times" 
           (click)="closeDialog()" 
           class="p-button-text"></button>
         <button *ngIf="exportEnabled" pButton label="ส่งออกข้อมูล" icon="pi pi-download" 
           (click)="exportData()" 
           class="p-button-text"></button>
-      </ng-template>
+      </ng-template> -->
     </p-dialog>
   `,
   styles: []
