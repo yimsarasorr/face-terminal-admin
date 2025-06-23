@@ -8,19 +8,27 @@
     <div class="flex flex-grow overflow-auto">
         <div class="w-1/8 p-4 border-r bg-gray-50 flex-shrink-0">
             <p-steps 
-                [model]="(steps$ | async)!" 
+                [model]="(stepsModel$ | async)!" 
                 [activeIndex]="(activeIndex$ | async) ?? 0"
-                (activeIndexChange)="onStepChange($event)"
-                [readonly]="false"
+                [readonly]="true"
                 styleClass="vertical-steps">
             </p-steps>
         </div>
 
-        <div class="w-2/8 flex-grow">
-            <div [ngSwitch]="(currentStep$ | async)?.id" class="h-full">
-                <app-select-building *ngSwitchCase="'select-building'" (next)="onNextStep($event)"></app-select-building>
-                <app-visitor-form *ngSwitchCase="'visitor-form'" (next)="onNextStep($event)" (back)="onPreviousStep()"></app-visitor-form>
-                <app-summary *ngSwitchCase="'summary'" [data]="visitorData" (confirm)="onConfirmRegistration()" (back)="onPreviousStep()"></app-summary>
+        <div class="w-7/8 flex-grow">
+            <div [ngSwitch]="(currentStep$ | async)?.pageId" class="h-full">
+
+                <app-visitor-type *ngSwitchCase="PageId.VISITOR_TYPE" (next)="onNext($event)"></app-visitor-type>
+                <app-terms-condition *ngSwitchCase="PageId.TERMS_CONDITION" (next)="onNext($event)" (back)="onBack()"></app-terms-condition>
+                <app-pre-registration-code *ngSwitchCase="PageId.PRE_REGISTRATION_CODE" (next)="onNext($event)" (back)="onBack()"></app-pre-registration-code>
+
+                <app-select-building *ngSwitchCase="PageId.SELECT_BUILDING" (next)="onNext($event)" (back)="onBack()"></app-select-building>
+                <app-visitor-form *ngSwitchCase="PageId.VISITOR_FORM" (next)="onNext($event)" (back)="onBack()"></app-visitor-form>
+                <app-summary *ngSwitchCase="PageId.SUMMARY" [data]="visitorData" (confirm)="onConfirm()" (back)="onBack()"></app-summary>
+                
+                <div *ngSwitchDefault>
+                    Loading or Page Not Found...
+                </div>
             </div>
         </div>
     </div>

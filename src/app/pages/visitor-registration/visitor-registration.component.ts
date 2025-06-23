@@ -1,37 +1,40 @@
-import { Component, OnInit } from '@angular/core'; // **เอา OnDestroy, Subject, takeUntil ออกได้ถ้าไม่ได้ใช้แล้ว**
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, AsyncPipe } from '@angular/common';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-// PrimeNG Modules
-import { DialogModule } from 'primeng/dialog';
-import { ButtonModule } from 'primeng/button';
+// PrimeNG
 import { StepsModule } from 'primeng/steps';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
 
-// Models and Services
-import { StepItem, VisitorData } from './models/visitor-workflow.model';
-import { VisitorNavigationService } from '../../services/visitor-navigation.service';
-import { VisitorWorkflowService } from '../../services/visitor-workflow.service';
-import { DialogService } from '../../services/dialog.service'; // **Path นี้อาจจะต้องแก้ให้ถูก**
+// --- Import Engine และ Workflow ---
+import { WorkflowEngineService } from '../../services/workflow-engine.service';
+import { VISITOR_WORKFLOW } from './visitor-workflow-data';
+import { HybridStep, VisitorData } from './models/hybrid-workflow.model';
+import { PageId } from './models/page-id.enum';
 
-// Step Components
+// --- Import Service ---
+import { DialogService } from '../../services/dialog.service';
+import { VisitorTypeComponent } from './steps/visitor-type/visitor-type.component';
+import { TermsConditionComponent } from './steps/terms-condition/terms-condition.component';
 import { SelectBuildingComponent } from './steps/select-building/select-building.component';
 import { VisitorFormComponent } from './steps/visitor-form/visitor-form.component';
+import { PreRegistrationCodeComponent } from './steps/pre-registration-code/pre-registration-code.component';
 import { SummaryComponent } from './steps/summary/summary.component';
+
 
 @Component({
   selector: 'app-visitor-registration',
   standalone: true,
   imports: [
-    CommonModule,
-    AsyncPipe,
-    DialogModule,
-    ButtonModule,
-    StepsModule,
-    ToastModule,
+    CommonModule, AsyncPipe, StepsModule, ToastModule, ButtonModule,
+    VisitorTypeComponent,
+    TermsConditionComponent,
     SelectBuildingComponent,
     VisitorFormComponent,
+    PreRegistrationCodeComponent,
     SummaryComponent
   ],
   providers: [MessageService],
@@ -40,53 +43,53 @@ import { SummaryComponent } from './steps/summary/summary.component';
 })
 export class VisitorRegistrationComponent implements OnInit {
   
-  visitorData: VisitorData = {};
+  visitorData: Partial<VisitorData> = {};
+  currentStep$: Observable<HybridStep | null>;
+  PageId = PageId;
 
-  steps$: Observable<StepItem[]>;
-  currentStep$: Observable<StepItem | null>;
+  // สำหรับ p-steps
+  stepsModel$: Observable<any[]>;
   activeIndex$: Observable<number>;
 
   constructor(
-    public navigationService: VisitorNavigationService,
-    private workflowService: VisitorWorkflowService,
-    private messageService: MessageService,
-    private dialogService: DialogService
+    private workflowEngine: WorkflowEngineService,
+    private dialogService: DialogService,
+    private messageService: MessageService
   ) {
-    this.steps$ = new Observable(subscriber => subscriber.next(this.workflowService.getSteps()));
-    this.currentStep$ = this.navigationService.currentStep$;
-    this.activeIndex$ = this.navigationService.activeIndex$;
+    this.currentStep$ = this.workflowEngine.currentStep$;
+    
+    const allStepsInOrder = VISITOR_WORKFLOW.flatMap(c => c.steps);
+    this.stepsModel$ = new Observable(s => s.next(
+      allStepsInOrder.map(step => ({ label: step.title }))
+    ));
+
+    this.activeIndex$ = this.currentStep$.pipe(
+      map(current => allStepsInOrder.findIndex(s => s.stepId === current?.stepId))
+    );
   }
 
   ngOnInit(): void {
-    this.visitorData = {};
-    this.navigationService.startFlow();
+    this.workflowEngine.start(VISITOR_WORKFLOW);
   }
 
-  onNextStep(dataFromStep: any): void {
+
+  onNext(dataFromStep: any): void {
     this.visitorData = { ...this.visitorData, ...dataFromStep };
-    this.navigationService.goToNextStep();
+    this.workflowEngine.calculateNextStep(this.visitorData);
   }
   
-  onPreviousStep(): void {
-    this.navigationService.goToPreviousStep();
+  onBack(): void {
+    this.workflowEngine.goToPreviousStep();
   }
   
-  onConfirmRegistration(): void {
-    console.log('ข้อมูลลงทะเบียนทั้งหมด:', this.visitorData);
+  onConfirm(): void {
+    console.log('Final Visitor Data:', this.visitorData);
     this.dialogService.close(this.visitorData);
-    this.messageService.add({ 
-      severity: 'success', 
-      summary: 'ลงทะเบียนสำเร็จ', 
-      detail: 'บันทึกข้อมูลผู้มาติดต่อเรียบร้อย' 
-    });
-  }
-
-  onStepChange(index: number): void {
-    this.navigationService.goToStep(index);
+    this.messageService.add({ severity: 'success', summary: 'สำเร็จ', detail: 'ลงทะเบียนเรียบร้อยแล้ว' });
   }
 
   onCancel(): void {
     this.dialogService.close();
-    this.messageService.add({ severity: 'warn', summary: 'ยกเลิก', detail: 'ยกเลิกการลงทะเบียน' });
   }
+
 }
