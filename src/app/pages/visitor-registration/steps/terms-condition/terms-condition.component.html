@@ -1,20 +1,21 @@
-<div class="flex flex-col h-full">
-  <div class="flex-grow p-8 flex flex-col items-center" [formGroup]="form">
-    <div class="mb-4 text-center">
-      <h3 class="text-xl font-semibold">ข้อกำหนดและเงื่อนไข</h3>
+<div class="p-fluid">
+  <div class="flex flex-col items-center" [formGroup]="form">
+    <h5 class="font-bold text-xl mb-4">ข้อกำหนดและเงื่อนไขการใช้งาน</h5>
+    
+    <div class="w-full p-4 border-1 border-gray-300 rounded-md h-48 overflow-y-auto mb-4">
+      <p>
+        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Vero quibusdam soluta aliquam! Dolore earum ipsam est voluptas ad laudantium neque?
+      </p>
     </div>
-    <div class="w-full p-4 border bg-white h-64 overflow-y-auto mb-4">
-      <p>โปรดอ่านข้อกำหนดและเงื่อนไขการใช้บริการ...</p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.</p>
-      <p>Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede.</p>
-    </div>
+
     <div class="flex items-center">
-      <p-checkbox formControlName="termsAccepted" [binary]="true" inputId="terms-check"></p-checkbox>
-      <label for="terms-check" class="ml-2">ข้าพเจ้ายอมรับข้อกำหนดและเงื่อนไข</label>
+      <p-checkbox formControlName="accepted" [binary]="true" inputId="termsCheckbox"></p-checkbox>
+      <label for="termsCheckbox" class="ml-2">ข้าพเจ้ายอมรับข้อกำหนดและเงื่อนไข</label>
     </div>
   </div>
-  <div class="p-4 border-t flex justify-between">
-    <p-button label="ย้อนกลับ" icon="pi pi-arrow-left" severity="secondary" (click)="onBack()"></p-button>
-    <p-button label="ถัดไป" icon="pi pi-arrow-right" iconPos="right" (click)="onNext()" [disabled]="form.invalid"></p-button>
+
+  <div class="flex justify-content-between mt-6">
+    <button pButton type="button" label="ย้อนกลับ" icon="pi pi-arrow-left" class="p-button-secondary" aria-label="ย้อนกลับ" (click)="onBack()"></button>
+    <button pButton type="button" label="ถัดไป" icon="pi pi-arrow-right" iconPos="right" aria-label="ถัดไป" (click)="onNext()" [disabled]="form.invalid"></button>
   </div>
 </div>

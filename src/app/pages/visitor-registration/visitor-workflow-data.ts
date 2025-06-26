@@ -1,84 +1,83 @@
-import { Chapter } from "./models/hybrid-workflow.model";
-import { PageId } from "./models/page-id.enum";
+import { PageId } from './models/page-id.enum';
+import { HybridWorkflow } from './models/hybrid-workflow.model';
 
-export const VISITOR_WORKFLOW: Chapter[] = [
-  {
-    chapterId: '1',
-    chapterName: 'เริ่มต้น',
-    startStepId: '1.1',
-    steps: [
-      {
-        stepId: '1.1',
-        pageId: PageId.VISITOR_TYPE,
-        title: 'ยินดีต้อนรับ',
-        back: null,
-        next: [
-          {
-            condition: { field: 'visitorType', operator: '==', value: 'new' },
-            goTo: '2.1'
+export const VISITOR_WORKFLOW: HybridWorkflow = {
+  id: 'visitor-registration-workflow',
+  name: 'Visitor Registration Workflow',
+  startChapterId: '1',
+  chapters: [
+    {
+      chapterId: '1',
+      chapterName: 'ประเภทผู้มาติดต่อ',
+      startStepId: '1.1',
+      steps: [
+        {
+          stepId: '1.1',
+          pageId: PageId.VISITOR_TYPE,
+          title: 'ประเภทผู้มาติดต่อ',
+          back: null,
+          next: [
+            { condition: { field: 'visitorType', operator: '==', value: 'new' }, goTo: '2.1' },
+            { condition: { field: 'visitorType', operator: '==', value: 'returning' }, goTo: '3.1' },
+          ],
+        },
+      ],
+    },
+    {
+      chapterId: '2',
+      chapterName: 'ลงทะเบียนสำหรับผู้มาติดต่อใหม่',
+      startStepId: '2.1',
+      steps: [
+        {
+          stepId: '2.1',
+          pageId: PageId.SELECT_BUILDING, // หน้าหลักคือ "เลือกอาคาร"
+          title: 'เลือกพื้นที่/อาคาร',
+          back: '1.1',
+          next: '2.2',
+          // --- นี่คือหัวใจสำคัญ: Dialog ซ้อน Dialog ---
+          subflow: {
+            id: 'terms-condition-subflow',
+            startStepId: 'sub-terms.1',
+            steps: [
+              {
+                stepId: 'sub-terms.1',
+                pageId: PageId.TERMS_CONDITION,
+                title: 'ข้อกำหนดและเงื่อนไข',
+                back: null,
+                next: null, // เมื่อ subflow step นี้จบ (เช่นกดยอมรับ) จะถือว่า subflow ทั้งหมดจบ
+              },
+            ],
           },
-          {
-            condition: { field: 'visitorType', operator: '==', value: 'returning' },
-            goTo: '3.1'
-          }
-        ]
-      }
-    ]
-  },
-  {
-    chapterId: '2',
-    chapterName: 'ลงทะเบียนผู้ใช้ใหม่',
-    startStepId: '2.1',
-    steps: [
-      {
-        stepId: '2.1',
-        pageId: PageId.TERMS_CONDITION,
-        title: 'ข้อกำหนดและเงื่อนไข',
-        back: '1.1',
-        next: '2.2'
-      },
-      {
-        stepId: '2.2',
-        pageId: PageId.SELECT_BUILDING,
-        title: 'ขั้นตอนที่ 1: เลือกพื้นที่อาคาร',
-        back: '2.1',
-        next: '2.3'
-      },
-      {
-        stepId: '2.3',
-        pageId: PageId.VISITOR_FORM,
-        title: 'ขั้นตอนที่ 2: กรอกข้อมูลส่วนตัว',
-        back: '2.2',
-        next: '4.1'
-      }
-    ]
-  },
-  {
-    chapterId: '3',
-    chapterName: 'สำหรับผู้ลงทะเบียนล่วงหน้า',
-    startStepId: '3.1',
-    steps: [
-      {
-        stepId: '3.1',
-        pageId: PageId.PRE_REGISTRATION_CODE,
-        title: 'ยืนยันรหัส',
-        back: '1.1',
-        next: '4.1'
-      }
-    ]
-  },
-  {
-    chapterId: '4',
-    chapterName: 'สรุป',
-    startStepId: '4.1',
-    steps: [
-      {
-        stepId: '4.1',
-        pageId: PageId.SUMMARY,
-        title: 'ขั้นตอนที่ 3: ตรวจสอบและยืนยันข้อมูล',
-        back: '2.3',
-        next: null
-      }
-    ]
-  }
-];
+        },
+        {
+          stepId: '2.2',
+          pageId: PageId.VISITOR_FORM,
+          title: 'ข้อมูลผู้มาติดต่อ',
+          back: '2.1',
+          next: '2.3',
+        },
+        {
+          stepId: '2.3',
+          pageId: PageId.SUMMARY,
+          title: 'สรุปข้อมูล',
+          back: '2.2',
+          next: null,
+        },
+      ],
+    },
+    {
+      chapterId: '3',
+      chapterName: 'สำหรับผู้มาติดต่อที่เคยลงทะเบียน',
+      startStepId: '3.1',
+      steps: [
+        {
+          stepId: '3.1',
+          pageId: PageId.PRE_REGISTRATION_CODE,
+          title: 'กรอกรหัส Pre-Registration',
+          back: '1.1',
+          next: '2.3',
+        },
+      ],
+    },
+  ],
+};

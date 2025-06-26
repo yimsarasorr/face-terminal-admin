@@ -1,12 +1,13 @@
 import { provideHttpClient, withFetch } from '@angular/common/http';
-import { ApplicationConfig } from '@angular/core';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { provideAnimations } from '@angular/platform-browser/animations'; // แก้ไข: ใช้ provideAnimations
 import { provideRouter, withEnabledBlockingInitialNavigation, withInMemoryScrolling, withComponentInputBinding } from '@angular/router';
 import Aura from '@primeng/themes/aura';
 import { providePrimeNG } from 'primeng/config';
 import { appRoutes } from './app.routes';
-import { DialogService } from './app/services/dialog.service';
-import { ComponentRegistryService } from './app/services/component-registry.service';
+
+import { DialogService as PrimeNgDialogService } from 'primeng/dynamicdialog'; 
+
 
 export const appConfig: ApplicationConfig = {
     providers: [
@@ -17,10 +18,13 @@ export const appConfig: ApplicationConfig = {
             withComponentInputBinding()
         ),
         provideHttpClient(withFetch()),
-        provideAnimationsAsync(),
+        provideAnimations(), // แก้ไข: ใช้ provideAnimations()
         providePrimeNG({ theme: { preset: Aura, options: { darkModeSelector: '.app-dark' } } }),
         
-        DialogService,
-        ComponentRegistryService
+        // --- ส่วนที่ต้องแก้ไข: เพิ่ม Provider ของ PrimeNG และลบ Service ของเราออกไป ---
+        PrimeNgDialogService,
+        
+        // ไม่ต้องประกาศ DialogService และ ComponentRegistryService ของเราที่นี่
+        // เพราะมันมี providedIn: 'root' อยู่แล้ว
     ]
 };

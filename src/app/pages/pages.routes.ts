@@ -3,7 +3,7 @@ import { Documentation } from './documentation/documentation';
 import { Crud } from './crud/crud';
 import { Empty } from './empty/empty';
 import { Reports } from './reports/reports';
-import { ReportFilters } from './reports/components/report-filters';
+import { ReportFiltersComponent } from './reports/components/report-filters';
 import { ActivityReport } from './reports/components/activity-report';
 import { Settings } from './settings/settings';
 
@@ -17,7 +17,7 @@ export default [
         component: Reports,
         children: [
             { path: '', component: Empty },
-            { path: 'visitors', component: ReportFilters },
+            { path: 'visitors', component: ReportFiltersComponent },
             { path: 'activity', component: ActivityReport },
             { path: 'logs', component: Empty },
             { path: 'export', component: Empty }

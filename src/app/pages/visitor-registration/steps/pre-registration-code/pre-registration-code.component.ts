@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
+import { WorkflowEngineService } from '../../../../services/workflow-engine.service';
 
 @Component({
   selector: 'app-pre-registration-code',
@@ -11,20 +12,21 @@ import { ButtonModule } from 'primeng/button';
   templateUrl: './pre-registration-code.component.html',
 })
 export class PreRegistrationCodeComponent {
-  @Output() next = new EventEmitter<any>();
-  @Output() back = new EventEmitter<void>();
+  private workflowEngine = inject(WorkflowEngineService);
 
+  // --- ส่วนที่แก้ไข: ทำให้ Type ของ FormControl ชัดเจนว่าเป็น string ---
   form = new FormGroup({
-    preRegistrationCode: new FormControl('', [Validators.required, Validators.minLength(6)])
+    preRegistrationCode: new FormControl('', { nonNullable: true, validators: Validators.required }),
   });
 
   onNext(): void {
     if (this.form.valid) {
-      this.next.emit(this.form.value);
+      // --- ส่วนที่แก้ไข: getRawValue() ตอนนี้จะคืนค่าเป็น {preRegistrationCode: string} ซึ่งเข้ากันได้ ---
+      this.workflowEngine.next(this.form.getRawValue());
     }
   }
 
   onBack(): void {
-    this.back.emit();
+    this.workflowEngine.back();
   }
 }
