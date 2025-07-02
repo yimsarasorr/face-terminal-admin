@@ -4,27 +4,28 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RadioButtonModule } from 'primeng/radiobutton';
 import { ButtonModule } from 'primeng/button';
 import { WorkflowEngineService } from '../../../../services/workflow-engine.service';
-import { VisitorData } from '../../models/hybrid-workflow.model'; // <-- Import VisitorData
+import { VisitorData } from '../../models/hybrid-workflow.model';
+import { StepperComponent } from '../../../../shared/stepper/stepper.component';
+import { WorkflowStateService } from '../../../../services/workflow-state.service';
 
 @Component({
   selector: 'app-visitor-type',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RadioButtonModule, ButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, RadioButtonModule, ButtonModule, StepperComponent],
   templateUrl: './visitor-type.component.html',
 })
 export class VisitorTypeComponent {
   private workflowEngine = inject(WorkflowEngineService);
+  public stateService = inject(WorkflowStateService); 
 
-  // --- ส่วนที่แก้ไข: กำหนด Type ให้ FormControl ตรงกับ Model ---
   form = new FormGroup({
     visitorType: new FormControl<'new' | 'returning' | null>(null, Validators.required)
   });
 
   onNext(): void {
     if (this.form.valid) {
-      // --- ส่วนที่แก้ไข: สร้าง object ใหม่ที่ Type ถูกต้อง ---
       const formData: Partial<VisitorData> = {
-        visitorType: this.form.controls.visitorType.value! // ใช้ ! เพื่อบอก TypeScript ว่าเรามั่นใจว่าค่าไม่เป็น null เพราะผ่าน .valid มาแล้ว
+        visitorType: this.form.controls.visitorType.value!
       };
       this.workflowEngine.next(formData);
     }

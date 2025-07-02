@@ -1,38 +1,67 @@
-<div class="flex justify-content-center align-items-center min-h-screen">
-  <div class="p-fluid" style="width: 100%; max-width: 480px;">
-    <div class="card">
-      <h5 class="font-bold text-xl mb-4">สรุปข้อมูลการลงทะเบียน</h5>
+<div class="flex flex-col h-full">
 
-      <div *ngIf="data">
-        <div class="mb-3">
-          <strong>ประเภทผู้มาติดต่อ:</strong> {{ data.visitorType === 'new' ? 'ผู้มาติดต่อใหม่' : 'ผู้มาติดต่อที่เคยลงทะเบียนแล้ว' }}
-        </div>
-        
-        <div *ngIf="data.building" class="mb-3">
-          <strong>อาคารที่เลือก:</strong> {{ data.building }}
-        </div>
+  <div class="flex-shrink-0">
+    <app-stepper></app-stepper>
+  </div>
 
-        <div *ngIf="data.firstName" class="mb-3">
-          <strong>ชื่อ:</strong> {{ data.firstName }}
-        </div>
-
-        <div *ngIf="data.lastName" class="mb-3">
-          <strong>นามสกุล:</strong> {{ data.lastName }}
-        </div>
-
-        <div *ngIf="data.preRegistrationCode" class="mb-3">
-          <strong>รหัส Pre-Registration:</strong> {{ data.preRegistrationCode }}
-        </div>
-
-        <div *ngIf="data.termsAccepted" class="mb-3 text-green-600">
-          <i class="pi pi-check-circle mr-2"></i><strong>ยอมรับข้อกำหนดและเงื่อนไขแล้ว</strong>
-        </div>
+  <div class="flex-auto overflow-y-auto p-8">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-8 text-center">
+        <h3 class="text-xl font-semibold">สรุปข้อมูลการลงทะเบียน</h3>
+        <p class="text-gray-500">กรุณาตรวจสอบความถูกต้องของข้อมูลก่อนยืนยัน</p>
       </div>
 
-      <div class="flex justify-content-between mt-6">
-        <button pButton type="button" label="ย้อนกลับ" icon="pi pi-arrow-left" class="p-button-secondary" aria-label="ย้อนกลับ" (click)="onBack()"></button>
-        <button pButton type="button" label="ยืนยันการลงทะเบียน" icon="pi pi-check" aria-label="ยืนยันการลงทะเบียน" (click)="onConfirm()"></button>
+      <div *ngIf="data" class="space-y-4 p-6 border rounded-lg bg-gray-50">
+        <div class="flex justify-between">
+          <span class="font-medium text-gray-600">ประเภทผู้มาติดต่อ:</span>
+          <span class="font-bold">{{ data.visitorType === 'new' ? 'ผู้มาติดต่อใหม่' : 'ผู้มาติดต่อที่เคยลงทะเบียนแล้ว' }}</span>
+        </div>
+        
+        <div *ngIf="data.building" class="flex justify-between">
+          <span class="font-medium text-gray-600">อาคารที่เลือก:</span>
+          <span class="font-bold">{{ data.building }}</span>
+        </div>
+
+        <div *ngIf="data.firstName" class="flex justify-between">
+          <span class="font-medium text-gray-600">ชื่อ:</span>
+          <span class="font-bold">{{ data.firstName }}</span>
+        </div>
+
+        <div *ngIf="data.lastName" class="flex justify-between">
+          <span class="font-medium text-gray-600">นามสกุล:</span>
+          <span class="font-bold">{{ data.lastName }}</span>
+        </div>
+
+        <div *ngIf="data.preRegistrationCode" class="flex justify-between">
+          <span class="font-medium text-gray-600">รหัส Pre-Registration:</span>
+          <span class="font-bold">{{ data.preRegistrationCode }}</span>
+        </div>
+
+        <div *ngIf="data.termsAccepted" class="flex justify-between items-center text-green-600">
+          <span class="font-medium">ข้อกำหนดและเงื่อนไข:</span>
+          <span class="font-bold flex items-center gap-2">
+            <i class="pi pi-check-circle"></i> ยอมรับแล้ว
+          </span>
+        </div>
       </div>
     </div>
   </div>
+
+  <div class="flex-shrink-0 p-4 border-t flex justify-between">
+    <button
+      *ngIf="stateService.canGoBack()"
+        pButton
+        type="button"
+        label="ย้อนกลับ"
+        icon="pi pi-arrow-left"
+        styleClass="p-button-secondary"
+        (click)="onBack()">
+    </button>
+    <p-button
+      label="ยืนยันการลงทะเบียน"
+      icon="pi pi-check"
+      (click)="onConfirm()">
+    </p-button>
+  </div>
+
 </div>

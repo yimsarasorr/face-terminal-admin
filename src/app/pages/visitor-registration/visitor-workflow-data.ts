@@ -30,11 +30,10 @@ export const VISITOR_WORKFLOW: HybridWorkflow = {
       steps: [
         {
           stepId: '2.1',
-          pageId: PageId.SELECT_BUILDING, // หน้าหลักคือ "เลือกอาคาร"
+          pageId: PageId.SELECT_BUILDING,
           title: 'เลือกพื้นที่/อาคาร',
           back: '1.1',
           next: '2.2',
-          // --- นี่คือหัวใจสำคัญ: Dialog ซ้อน Dialog ---
           subflow: {
             id: 'terms-condition-subflow',
             startStepId: 'sub-terms.1',
@@ -44,7 +43,7 @@ export const VISITOR_WORKFLOW: HybridWorkflow = {
                 pageId: PageId.TERMS_CONDITION,
                 title: 'ข้อกำหนดและเงื่อนไข',
                 back: null,
-                next: null, // เมื่อ subflow step นี้จบ (เช่นกดยอมรับ) จะถือว่า subflow ทั้งหมดจบ
+                next: null,
               },
             ],
           },

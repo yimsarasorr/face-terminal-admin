@@ -14,8 +14,8 @@
     </div>
   </div>
 
-  <div class="flex justify-content-between mt-6">
-    <button pButton type="button" label="ย้อนกลับ" icon="pi pi-arrow-left" class="p-button-secondary" aria-label="ย้อนกลับ" (click)="onBack()"></button>
-    <button pButton type="button" label="ถัดไป" icon="pi pi-arrow-right" iconPos="right" aria-label="ถัดไป" (click)="onNext()" [disabled]="form.invalid"></button>
-  </div>
+    <div class="p-4 border-t flex justify-end">
+        <p-button label="ถัดไป" icon="pi pi-arrow-right" iconPos="right" (click)="onNext()"
+            [disabled]="form.invalid"></p-button>
+    </div>
 </div>

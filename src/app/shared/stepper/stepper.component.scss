@@ -1,0 +1,8 @@
+.p-steps .p-steps-item.completed .p-steps-number {
+  background: #22c55e;
+  color: #ffffff;
+}
+.p-steps .p-steps-item.completed.p-steps-current .p-menuitem-link {
+  font-weight: bold;
+  text-decoration: underline;
+}

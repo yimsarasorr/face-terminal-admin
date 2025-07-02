@@ -4,11 +4,12 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { DropdownModule } from 'primeng/dropdown';
 import { ButtonModule } from 'primeng/button';
 import { WorkflowEngineService } from '../../../../services/workflow-engine.service';
+import { StepperComponent } from '../../../../shared/stepper/stepper.component';
 
 @Component({
   selector: 'app-select-building',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, DropdownModule, ButtonModule],
+  imports: [CommonModule, ReactiveFormsModule, DropdownModule, ButtonModule, StepperComponent],
   templateUrl: './select-building.component.html',
 })
 export class SelectBuildingComponent {

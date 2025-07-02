@@ -1,26 +1,52 @@
 <div class="flex flex-col h-full">
-  <div class="flex-grow p-8 flex flex-col items-center justify-center" [formGroup]="form">
-    <div class="mb-8 text-center">
-      <h3 class="text-xl font-semibold">กรุณาเลือกประเภทผู้มาติดต่อ</h3>
-    </div>
-    <div class="flex flex-col gap-4">
-      <div class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-100" (click)="form.controls.visitorType.setValue('new')">
-        <p-radioButton value="new" formControlName="visitorType" inputId="type-new"></p-radioButton>
-        <label for="type-new" class="ml-4">
-          <span class="font-bold">ผู้มาติดต่อครั้งแรก</span><br>
-          <span class="text-sm text-gray-600">สำหรับผู้ที่ยังไม่เคยลงทะเบียน</span>
-        </label>
+
+  <div class="flex-shrink-0">
+    <app-stepper></app-stepper>
+  </div>
+
+  <div class="flex-auto overflow-y-auto p-8" [formGroup]="form">
+    <div class="flex flex-col items-center justify-center">
+      <div class="mb-8 text-center">
+        <h3 class="text-xl font-semibold">กรุณาเลือกประเภทผู้มาติดต่อ</h3>
       </div>
-      <div class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-100" (click)="form.controls.visitorType.setValue('returning')">
-        <p-radioButton value="returning" formControlName="visitorType" inputId="type-returning"></p-radioButton>
-        <label for="type-returning" class="ml-4">
-          <span class="font-bold">มีรหัสลงทะเบียนล่วงหน้า</span><br>
-          <span class="text-sm text-gray-600">สำหรับผู้ที่ได้รับรหัสการนัดหมาย</span>
-        </label>
+      <div class="flex flex-col gap-4">
+        <div class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-100" (click)="form.controls.visitorType.setValue('new')">
+          <p-radioButton value="new" formControlName="visitorType" inputId="type-new"></p-radioButton>
+          <label for="type-new" class="ml-4 cursor-pointer">
+            <span class="font-bold">ผู้มาติดต่อครั้งแรก</span><br>
+            <span class="text-sm text-gray-600">สำหรับผู้ที่ยังไม่เคยลงทะเบียน</span>
+          </label>
+        </div>
+        <div class="flex items-center p-4 border rounded-lg cursor-pointer hover:bg-gray-100" (click)="form.controls.visitorType.setValue('returning')">
+          <p-radioButton value="returning" formControlName="visitorType" inputId="type-returning"></p-radioButton>
+          <label for="type-returning" class="ml-4 cursor-pointer">
+            <span class="font-bold">มีรหัสลงทะเบียนล่วงหน้า</span><br>
+            <span class="text-sm text-gray-600">สำหรับผู้ที่ได้รับรหัสการนัดหมาย</span>
+          </label>
+        </div>
       </div>
     </div>
   </div>
-  <div class="p-4 border-t flex justify-end">
-    <p-button label="ถัดไป" icon="pi pi-arrow-right" iconPos="right" (click)="onNext()" [disabled]="form.invalid"></p-button>
-  </div>
+
+  <div class="flex-shrink-0 p-4 border-t flex gap-2">
+    <p-button
+        *ngIf="stateService.canGoBack()"
+        pButton
+        type="button"
+        label="ย้อนกลับ"
+        icon="pi pi-arrow-left"
+        styleClass="p-button-secondary"
+        (click)="onBack()">
+    </p-button>
+
+    <p-button
+        class="ml-auto" 
+        label="ถัดไป"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        (click)="onNext()"
+        [disabled]="form.invalid">
+    </p-button>
+</div>
+
 </div>
