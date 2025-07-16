@@ -2,7 +2,7 @@ import { PageId } from './models/page-id.enum';
 import { HybridWorkflow } from './models/hybrid-workflow.model';
 
 export const VISITOR_WORKFLOW: HybridWorkflow = {
-  id: 'visitor-registration-workflow',
+  id: 'registration',
   name: 'Visitor Registration Workflow',
   startChapterId: '1',
   chapters: [

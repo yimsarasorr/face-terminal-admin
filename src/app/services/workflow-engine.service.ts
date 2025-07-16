@@ -1,6 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, signal, inject } from '@angular/core';
+import { Router, ActivatedRoute, NavigationEnd } from '@angular/router'; // เพิ่ม NavigationEnd
+import { filter } from 'rxjs'; // เพิ่ม filter
 import { WorkflowDialogService } from './workflow-dialog.service';
-import { WorkflowStateService } from './workflow-state.service'; // ++ Import State Service
+import { WorkflowStateService } from './workflow-state.service';
 import { VISITOR_WORKFLOW } from '../pages/visitor-registration/visitor-workflow-data';
 import {
   HybridWorkflow,
@@ -17,15 +19,39 @@ import {
 export class WorkflowEngineService {
   private workflow: HybridWorkflow = VISITOR_WORKFLOW;
   private dialogService: WorkflowDialogService = inject(WorkflowDialogService);
-  private stateService = inject(WorkflowStateService);
+  private stateService: WorkflowStateService = inject(WorkflowStateService);
+  private router: Router = inject(Router);
+  private route: ActivatedRoute = inject(ActivatedRoute);
 
-  constructor() {}
+  constructor() {
+    // --- ส่วนที่เพิ่มเข้ามาที่ 1: ให้ Engine คอยดักฟัง URL เพื่อเริ่มทำงาน ---
+    this.listenToUrlChangesForStart();
+
+    // ดักฟังเมื่อ Dialog ถูกปิดโดยผู้ใช้ (โค้ดนี้อาจไม่จำเป็น ถ้าไม่มีปัญหา)
+    // this.dialogService.onClose.subscribe(() => { ... });
+  }
+  
+  // --- เพิ่มเมธอดนี้เข้ามาใหม่ ---
+  private listenToUrlChangesForStart(): void {
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd)
+    ).subscribe(() => {
+      const params = this.route.snapshot.queryParams;
+      const workflowId = params['workflowId'];
+      const startStep = params['step'];
+
+      if (workflowId === this.workflow.id && startStep && !this.stateService.state().workflowId) {
+        console.log(`WorkflowEngine: Detected URL, starting at step ${startStep}`);
+        this.startAtStep(startStep);
+      }
+    });
+  }
 
   public start() {
     const startChapter = this.workflow.chapters.find(c => c.chapterId === this.workflow.startChapterId);
     if (!startChapter) {
-        console.error('Start chapter not found!');
-        return;
+      console.error('Start chapter not found!');
+      return;
     }
     this.startAtStep(startChapter.startStepId);
   }
@@ -41,10 +67,11 @@ export class WorkflowEngineService {
 
     this.dialogService.closeAll();
 
+    // อัปเดต state
     this.stateService.state.set({
       workflowId: this.workflow.id,
       currentChapterId: chapter.chapterId,
-      currentStepId: step.stepId,
+      currentStepId: null, // เริ่มเป็น null ก่อน
       history: [],
       workflowData: initialData || {},
       activeSubflow: null,
@@ -55,7 +82,7 @@ export class WorkflowEngineService {
 
   public next(data?: Partial<VisitorData>) {
     if (data) this.updateWorkflowData(data);
-    
+
     const currentState = this.stateService.state(); 
     if (currentState.activeSubflow) {
       this.endSubflow();
@@ -68,7 +95,7 @@ export class WorkflowEngineService {
       this.navigateToStep(nextStepId);
     } else {
       console.log('Workflow Ended.');
-      this.dialogService.closeAll();
+      this.clearWorkflowStateAndUrl(); // <-- แก้ไข: เรียกใช้เมธอดนี้
     }
   }
 
@@ -79,6 +106,20 @@ export class WorkflowEngineService {
     if (previousStepId) {
       this.navigateToStep(previousStepId, true);
     }
+  }
+
+  public clearWorkflowStateAndUrl(): void {
+    this.dialogService.closeAll();
+    this.stateService.state.set({
+      workflowId: null, currentChapterId: null, currentStepId: null,
+      history: [], workflowData: {}, activeSubflow: null
+    });
+    // สั่งลบ Query Params ออกจาก URL
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { workflowId: null, step: null },
+      queryParamsHandling: 'merge',
+    });
   }
 
   private navigateToStep(stepId: string, isNavigatingBack: boolean = false) {
@@ -92,9 +133,14 @@ export class WorkflowEngineService {
       return { ...s, currentStepId: stepId, history: newHistory };
     });
 
+    // เรียกใช้ updateUrlQueryParam เฉพาะเมื่อไม่ได้อยู่ใน subflow
     const currentState = this.stateService.state();
+    if (!currentState.activeSubflow) {
+      this.updateUrlQueryParam(stepId);
+    }
+
     if (currentState.activeSubflow === null) {
-        if(!isNavigatingBack) this.dialogService.close();
+      if(!isNavigatingBack) this.dialogService.close();
     }
     
     this.dialogService.open(step, currentState.workflowData, currentState.activeSubflow !== null);
@@ -162,5 +208,17 @@ export class WorkflowEngineService {
       }
     }
     return undefined;
+  }
+
+  // --- ส่วนที่แก้ไข: ยกเครื่อง updateUrlQueryParam ให้แน่นอนที่สุด ---
+  private updateUrlQueryParam(stepId: string): void {
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        workflowId: this.workflow.id, // ใช้ ID จาก workflow โดยตรง
+        step: stepId
+      },
+      queryParamsHandling: 'merge' // ใช้ 'merge' เพื่อรักษา query param อื่นๆ
+    });
   }
 }

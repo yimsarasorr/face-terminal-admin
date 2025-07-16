@@ -40,15 +40,20 @@ export class AppComponent implements OnInit {
       take(1),
       map(() => this.route.snapshot.queryParams)
     ).subscribe(params => {
-      const workflowName = params['workflow'];
+      // --- ส่วนที่แก้ไข: เปลี่ยน 'workflow' เป็น 'workflowId' ---
+      const workflowId = params['workflowId'];
       const startStep = params['step'];
 
-      if (workflowName === 'registration' && startStep) {
-        console.log(`Starting workflow from URL with step: ${startStep}`);
-
-        setTimeout(() => {
-            this.workflowEngine.startAtStep(startStep);
-        }, 0);
+      // --- ส่วนที่แก้ไข: ตรวจสอบ workflowId ---
+      if (workflowId && startStep) {
+        console.log(`Starting workflow '${workflowId}' from URL with step: ${startStep}`);
+        
+        // เราสามารถเพิ่มเงื่อนไขได้อีกถ้ามีหลาย workflow
+        if (workflowId === 'visitor-registration') {
+            setTimeout(() => {
+                this.workflowEngine.startAtStep(startStep);
+            }, 0);
+        }
       }
     });
   }
