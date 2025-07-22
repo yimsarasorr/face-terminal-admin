@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutService } from '../service/layout.service';
 import { AppMenu } from './app.menu';
@@ -23,5 +23,7 @@ import { RouterModule } from '@angular/router';
     `
 })
 export class AppSidebar {
+    @ViewChild(AppMenu) menuComponent!: AppMenu;
+
     constructor(public layoutService: LayoutService) {}
 }

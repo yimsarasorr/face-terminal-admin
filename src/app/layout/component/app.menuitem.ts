@@ -1,4 +1,4 @@
-import { Component, HostBinding, Input } from '@angular/core';
+import { Component, HostBinding, Input, OnDestroy, OnInit } from '@angular/core';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { animate, state, style, transition, trigger } from '@angular/animations';
 import { Subscription } from 'rxjs';
@@ -10,7 +10,6 @@ import { TooltipModule } from 'primeng/tooltip';
 import { LayoutService } from '../service/layout.service';
 
 @Component({
-    // eslint-disable-next-line @angular-eslint/component-selector
     selector: '[app-menuitem]',
     standalone: true,
     imports: [CommonModule, RouterModule, RippleModule, TooltipModule],
@@ -71,7 +70,8 @@ import { LayoutService } from '../service/layout.service';
             state(
                 'collapsed',
                 style({
-                    height: '0'
+                    height: '0',
+                    overflow: 'hidden'
                 })
             ),
             state(
@@ -84,21 +84,15 @@ import { LayoutService } from '../service/layout.service';
         ])
     ],
 })
-export class AppMenuitem {
+export class AppMenuitem implements OnInit, OnDestroy {
     @Input() item!: MenuItem;
-
     @Input() index!: number;
-
     @Input() @HostBinding('class.layout-root-menuitem') root!: boolean;
-
     @Input() parentKey!: string;
 
     active = false;
-
     menuSourceSubscription: Subscription;
-
     menuResetSubscription: Subscription;
-
     key: string = '';
 
     constructor(
@@ -121,7 +115,7 @@ export class AppMenuitem {
             this.active = false;
         });
 
-        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe((params) => {
+        this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
             if (this.item.routerLink) {
                 this.updateActiveStateFromRoute();
             }
@@ -130,37 +124,36 @@ export class AppMenuitem {
 
     ngOnInit() {
         this.key = this.parentKey ? this.parentKey + '-' + this.index : String(this.index);
-
         if (this.item.routerLink) {
             this.updateActiveStateFromRoute();
         }
     }
 
     updateActiveStateFromRoute() {
-        let activeRoute = this.router.isActive(this.item.routerLink[0], { paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' });
-
+        let activeRoute = this.router.isActive(this.item.routerLink![0], { paths: 'exact', queryParams: 'ignored', matrixParams: 'ignored', fragment: 'ignored' });
         if (activeRoute) {
             this.layoutService.onMenuStateChange({ key: this.key, routeEvent: true });
         }
     }
 
     itemClick(event: Event) {
-        // avoid processing disabled items
         if (this.item.disabled) {
             event.preventDefault();
             return;
         }
 
-        // execute command
         if (this.item.command) {
             this.item.command({ originalEvent: event, item: this.item });
         }
 
-        // toggle active state
         if (this.item.items) {
             this.active = !this.active;
+        } else {
+            if (this.layoutService.isMobile()) {
+                this.layoutService.hideMobileMenu();
+            }
         }
-
+        
         this.layoutService.onMenuStateChange({ key: this.key });
     }
 

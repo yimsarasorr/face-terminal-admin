@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
+import { LayoutService } from '../service/layout.service';
 
 @Component({
     selector: 'app-page-header',
@@ -10,6 +11,11 @@ import { ButtonModule } from 'primeng/button';
     <div class="page-header">
         <div class="page-header-content">
             <div class="page-header-left">
+                <button 
+                    class="p-button p-button-icon-only p-button-text p-button-plain mobile-menu-button layout-topbar-menu-button" 
+                    (click)="onMenuToggle()">
+                    <i class="pi pi-bars text-xl"></i>
+                </button>
                 <h1 class="page-title">{{title}}</h1>
                 <p *ngIf="subtitle" class="page-subtitle">{{subtitle}}</p>
             </div>
@@ -46,6 +52,12 @@ import { ButtonModule } from 'primeng/button';
             align-items: center;
             width: 100%;
         }
+
+        .page-header-left {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
         
         .page-title {
             margin: 0;
@@ -60,8 +72,16 @@ import { ButtonModule } from 'primeng/button';
             color: var(--text-color-secondary);
             font-size: 0.875rem;
         }
+
+        .mobile-menu-button {
+            display: none;
+        }
         
-        @media (max-width: 768px) {
+        @media (max-width: 991px) {
+            .mobile-menu-button {
+                display: inline-flex;
+            }
+
             .page-header-content {
                 flex-direction: row;
                 align-items: center;
@@ -69,7 +89,7 @@ import { ButtonModule } from 'primeng/button';
             
             .page-header {
                 height: 4.6rem;
-                padding: 0 1.5rem;
+                padding: 0 1rem;
             }
             
             .page-subtitle {
@@ -85,4 +105,10 @@ import { ButtonModule } from 'primeng/button';
 export class PageHeader {
     @Input() title: string = '';
     @Input() subtitle: string = '';
+
+    constructor(private layoutService: LayoutService) {}
+    
+    onMenuToggle() {
+        this.layoutService.onMenuToggle();
+    }
 }

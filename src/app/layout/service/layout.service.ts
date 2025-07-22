@@ -146,27 +146,28 @@ export class LayoutService {
     }
 
     onMenuToggle() {
-        if (this.isSlim()) {
-            return;
+        // สำหรับ Desktop mode 
+        if (this.isDesktop() && !this.isSlim() && !this.isOverlay()) {
+            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !prev.staticMenuDesktopInactive }));
         }
-        
-        if (this.isOverlay()) {
-            this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !this.layoutState().overlayMenuActive }));
-
+        // สำหรับ Overlay mode
+        else if (this.isOverlay()) {
+            this.layoutState.update((prev) => ({ ...prev, overlayMenuActive: !prev.overlayMenuActive }));
             if (this.layoutState().overlayMenuActive) {
                 this.overlayOpen.next(null);
             }
         }
-
-        if (this.isDesktop()) {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuDesktopInactive: !this.layoutState().staticMenuDesktopInactive }));
-        } else {
-            this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !this.layoutState().staticMenuMobileActive }));
-
+        // สำหรับ Mobile 
+        else {
+            this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: !prev.staticMenuMobileActive }));
             if (this.layoutState().staticMenuMobileActive) {
                 this.overlayOpen.next(null);
             }
         }
+    }
+
+    hideMobileMenu() {
+        this.layoutState.update((prev) => ({ ...prev, staticMenuMobileActive: false, overlayMenuActive: false }));
     }
 
     isDesktop() {
